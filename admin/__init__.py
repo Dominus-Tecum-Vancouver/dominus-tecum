@@ -11,6 +11,7 @@ for different environments (development, production, testing).
 
 import os
 
+from flask_cors import CORS
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
@@ -63,6 +64,7 @@ def create_app():
     # Attach the SQLAlchemy db object to our app.
     # After this call, db knows which database to talk to.
     db.init_app(app)
+    CORS(app)
 
     # ── Register routes (Blueprint) ────────────────────────────────────────
 

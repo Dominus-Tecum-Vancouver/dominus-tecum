@@ -8,3 +8,4 @@ google-api-python-client==2.128.0
 gspread==6.1.2
 gunicorn==22.0.0
 werkzeug==3.0.3
+flask-cors==4.0.0
