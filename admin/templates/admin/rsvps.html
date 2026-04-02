@@ -1,0 +1,70 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+
+<div class="page-title">RSVPs</div>
+<div class="page-sub">{{ rsvps|length }} confirmaciones encontradas</div>
+
+<!-- Filter by event -->
+<div class="card" style="padding:16px 24px;margin-bottom:20px">
+  <form method="GET" style="display:flex;align-items:center;gap:12px">
+    <label style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;color:#6A7E85;white-space:nowrap">
+      FILTRAR POR EVENTO
+    </label>
+    <select name="event_id" onchange="this.form.submit()"
+            style="padding:7px 10px;border:1px solid #ddd;border-radius:5px;font-size:13px;color:#2A1810;flex:1;max-width:320px">
+      <option value="">— Todos los eventos —</option>
+      {% for e in events %}
+        <option value="{{ e.id }}" {{ 'selected' if selected_event == e.id }}>
+          {{ e.date.strftime('%d %b') }} · {{ e.title_es }}
+        </option>
+      {% endfor %}
+    </select>
+    {% if selected_event %}
+      <a href="/admin/rsvps" class="btn btn-outline btn-sm">Limpiar</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- RSVPs table -->
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Evento</th>
+        <th>Primera vez</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rsvps %}
+      <tr>
+        <td style="color:#999;font-size:12px;white-space:nowrap">
+          {{ r.created_at.strftime('%d %b %Y %H:%M') }}
+        </td>
+        <td style="font-weight:500">{{ r.name }}</td>
+        <td>
+          <a href="mailto:{{ r.email }}" style="color:#5B8A9A;font-size:12px">{{ r.email }}</a>
+        </td>
+        <td style="font-size:12px">{{ r.event.title_es }}</td>
+        <td>
+          {% if r.first_time %}
+            <span class="badge badge-first">SÍ ✦</span>
+          {% else %}
+            <span style="color:#ccc">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" style="text-align:center;color:#999;padding:32px">
+          No hay RSVPs {{ 'para este evento' if selected_event else 'todavía' }}.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

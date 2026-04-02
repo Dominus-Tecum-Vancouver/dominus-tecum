@@ -1,0 +1,367 @@
+"""
+admin/routes.py — URL Routes
+==============================
+This file defines every URL endpoint the app responds to.
+There are two categories:
+
+  1. Public API endpoints (/api/events, /api/rsvp)
+     — Called by the frontend JavaScript, return JSON
+
+  2. Admin panel routes (/admin, /admin/events, /admin/rsvps)
+     — Only accessible after logging in, return HTML pages
+
+We use a Flask Blueprint to group all these routes together.
+A Blueprint is like a mini app that gets registered onto the main app
+in __init__.py. It helps keep the code organized.
+"""
+
+from datetime import datetime
+
+from flask import (
+    Blueprint,       # Groups routes into a reusable component
+    abort,           # Returns HTTP error responses (404, 403, etc.)
+    jsonify,         # Converts Python dicts/lists to JSON responses
+    redirect,        # Sends the browser to a different URL
+    render_template, # Renders an HTML template file
+    request,         # Gives access to incoming request data (form, JSON, args)
+    session,         # Server-side session storage (persists across requests)
+    url_for,         # Generates a URL from a route function name
+)
+from werkzeug.security import check_password_hash  # Verifies hashed passwords
+
+from . import db
+from .gmail_service import send_rsvp_confirmation, send_rsvp_notification
+from .models import Event, RSVP
+from .sheets_service import log_rsvp
+
+# Create the Blueprint — 'main' is its name, used internally by Flask
+bp = Blueprint('main', __name__)
+
+# This will be set by the app factory in __init__.py.
+# We can't set it here because the env var isn't available at import time.
+ADMIN_PASSWORD_HASH = None
+
+
+# ── Auth Helper ────────────────────────────────────────────────────────────────
+
+def admin_required(f):
+    """
+    A decorator that protects admin routes from unauthenticated access.
+
+    A decorator wraps a function to add behaviour before/after it runs.
+    Usage: put @admin_required above any route that needs login protection.
+
+    How it works:
+      1. When someone visits a protected route, this runs first
+      2. It checks if 'admin' is set in their session (set at login)
+      3. If not logged in → redirect to login page
+      4. If logged in → run the original route function normally
+
+    The session is a secure cookie stored in the browser.
+    Flask signs it with SECRET_KEY so it can't be tampered with.
+    """
+    from functools import wraps
+
+    @wraps(f)  # Preserves the original function's name and docstring
+    def decorated(*args, **kwargs):
+        if not session.get('admin'):
+            # Not logged in — send them to the login page
+            return redirect(url_for('main.admin_login'))
+        # Logged in — run the actual route function
+        return f(*args, **kwargs)
+    return decorated
+
+
+# ── Public API ─────────────────────────────────────────────────────────────────
+
+@bp.route('/api/events')
+def api_events():
+    """
+    GET /api/events?lang=es
+
+    Returns a JSON list of all active events.
+    The frontend JavaScript calls this on page load to populate the events section.
+
+    Query parameter:
+      ?lang=es  — returns Spanish titles/descriptions (default)
+      ?lang=en  — returns English titles/descriptions
+
+    Example response:
+      [
+        {
+          "id": 1,
+          "title": "Noche de Convivencia",
+          "desc": "Una noche relajada...",
+          "date": "11",
+          "month": "ABR",
+          "time": "6:30 PM",
+          "tag": "social"
+        },
+        ...
+      ]
+    """
+    # Read the ?lang= query parameter, default to 'es' if not provided
+    lang = request.args.get('lang', 'es')
+
+    # Query the database for active events, sorted by date (soonest first)
+    events = Event.query.filter_by(active=True).order_by(Event.date).all()
+
+    # Convert each Event object to a dict, then return as JSON
+    # jsonify() automatically sets the Content-Type header to application/json
+    return jsonify([e.to_dict(lang) for e in events])
+
+
+@bp.route('/api/rsvp', methods=['POST'])
+def api_rsvp():
+    """
+    POST /api/rsvp
+
+    Accepts an RSVP submission from the frontend form.
+    Expects a JSON body with: name, email, event_id, first_time
+
+    On success:
+      1. Saves the RSVP to SQLite
+      2. Logs it to Google Sheets as a backup
+      3. Sends a confirmation email to the attendee
+      4. Sends a notification email to the group inbox
+
+    Returns JSON: { "status": "ok", "message": "¡Gracias, Alberto!" }
+    """
+    # request.get_json() parses the incoming JSON body.
+    # silent=True means it returns None instead of raising an error
+    # if the body isn't valid JSON.
+    data = request.get_json(silent=True)
+    if not data:
+        # 400 Bad Request — the request body wasn't valid JSON
+        return jsonify({'error': 'Invalid JSON'}), 400
+
+    # Extract fields from the JSON body, with safe defaults
+    name       = data.get('name', '').strip()    # .strip() removes accidental whitespace
+    email      = data.get('email', '').strip()
+    event_id   = data.get('event_id')
+    first_time = bool(data.get('first_time', False))  # Convert to bool safely
+
+    # Validate that all required fields are present
+    if not name or not email or not event_id:
+        # 422 Unprocessable Entity — the data is there but incomplete
+        return jsonify({'error': 'Missing required fields'}), 422
+
+    # Look up the event in the database
+    event = Event.query.get(event_id)
+    if not event or not event.active:
+        # 404 Not Found — event doesn't exist or has been archived
+        return jsonify({'error': 'Event not found'}), 404
+
+    # ── Step 1: Save to SQLite ──────────────────────────────────────────────
+    # Create a new RSVP object (this doesn't save yet — just creates it in memory)
+    rsvp = RSVP(name=name, email=email, event_id=event_id, first_time=first_time)
+    # Add it to the database session (staging area for changes)
+    db.session.add(rsvp)
+    # Commit writes all staged changes to the database file permanently
+    db.session.commit()
+
+    # Use Spanish event title for emails (the group's primary language)
+    event_title = event.title_es
+
+    # ── Step 2: Log to Google Sheets ───────────────────────────────────────
+    # This is wrapped in its own try/except inside log_rsvp() so if Sheets
+    # is unavailable, the RSVP is still saved and emails still go out.
+    log_rsvp(name, email, event_title, first_time)
+
+    # ── Step 3: Confirmation email to the person who RSVPed ────────────────
+    # This is a branded HTML email thanking them and showing the event details.
+    send_rsvp_confirmation(name, email, event_title)
+
+    # ── Step 4: Notification email to the group Gmail inbox ────────────────
+    # A simple summary email so leaders know someone new is coming.
+    send_rsvp_notification(name, email, event_title, first_time)
+
+    # Return success — the frontend will show a thank-you message
+    return jsonify({'status': 'ok', 'message': f'¡Gracias, {name}!'})
+
+
+# ── Admin Panel ────────────────────────────────────────────────────────────────
+
+@bp.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    """
+    GET  /admin/login — Shows the login form
+    POST /admin/login — Processes the submitted password
+
+    We use a single password (no usernames) for simplicity.
+    The password is stored hashed in ADMIN_PASSWORD_HASH — we never
+    store or compare plain text passwords.
+    """
+    error = None
+
+    if request.method == 'POST':
+        # request.form is a dictionary of submitted HTML form fields
+        password = request.form.get('password', '')
+
+        # check_password_hash compares the submitted password against
+        # the stored hash. Returns True if they match.
+        if check_password_hash(ADMIN_PASSWORD_HASH, password):
+            # Set 'admin': True in the session cookie.
+            # This persists across requests until logout or browser close.
+            session['admin'] = True
+            # Redirect to the dashboard after successful login
+            return redirect(url_for('main.admin_dashboard'))
+
+        # Wrong password — set error message to display on the form
+        error = 'Contraseña incorrecta.'
+
+    # GET request (first visit) or failed POST — show the login form
+    # Pass `error` to the template so it can display it if needed
+    return render_template('admin/login.html', error=error)
+
+
+@bp.route('/admin/logout')
+def admin_logout():
+    """
+    GET /admin/logout
+
+    Clears the admin session (logs out) and redirects to login.
+    session.pop() removes the 'admin' key if it exists, or does
+    nothing if it doesn't (the None default prevents a KeyError).
+    """
+    session.pop('admin', None)
+    return redirect(url_for('main.admin_login'))
+
+
+@bp.route('/admin')
+@admin_required  # ← This decorator runs first, checking login before the function
+def admin_dashboard():
+    """
+    GET /admin
+
+    The main admin dashboard — shows all events and recent RSVPs.
+    Only accessible when logged in (enforced by @admin_required).
+    """
+    # Get all events, most recent first
+    events = Event.query.order_by(Event.date.desc()).all()
+    # Get the 50 most recent RSVPs — enough for the dashboard summary
+    rsvps = RSVP.query.order_by(RSVP.created_at.desc()).limit(50).all()
+
+    # render_template() finds the file in the templates/ folder,
+    # fills in the variables we pass, and returns the resulting HTML.
+    return render_template('admin/dashboard.html', events=events, rsvps=rsvps)
+
+
+@bp.route('/admin/events/new', methods=['GET', 'POST'])
+@admin_required
+def admin_event_new():
+    """
+    GET  /admin/events/new — Shows the blank event creation form
+    POST /admin/events/new — Creates a new event from the form data
+    """
+    if request.method == 'POST':
+        # request.form contains all the HTML form fields by name
+        f = request.form
+
+        # Build a new Event object from the submitted form data
+        event = Event(
+            title_es = f['title_es'],
+            title_en = f['title_en'],
+            desc_es  = f['desc_es'],
+            desc_en  = f['desc_en'],
+            # strptime parses a date string into a Python date object.
+            # '%Y-%m-%d' matches the format HTML date inputs produce (e.g. "2026-04-11")
+            # .date() strips the time part since we only need the date.
+            date     = datetime.strptime(f['date'], '%Y-%m-%d').date(),
+            time     = f['time'],
+            tag      = f['tag'],
+            active   = True,  # New events are active by default
+        )
+        db.session.add(event)
+        db.session.commit()
+
+        # After creating the event, redirect back to the dashboard
+        return redirect(url_for('main.admin_dashboard'))
+
+    # GET — show the empty form (event=None tells the template it's a new event)
+    return render_template('admin/event_form.html', event=None)
+
+
+@bp.route('/admin/events/<int:event_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_event_edit(event_id):
+    """
+    GET  /admin/events/3/edit — Shows the form pre-filled with event 3's data
+    POST /admin/events/3/edit — Saves changes to event 3
+
+    <int:event_id> in the URL is a path parameter — Flask extracts the
+    number and passes it as the event_id argument to this function.
+    """
+    # get_or_404() fetches the event by ID, or automatically returns
+    # a 404 Not Found response if no event with that ID exists.
+    event = Event.query.get_or_404(event_id)
+
+    if request.method == 'POST':
+        f = request.form
+        # Update each field on the existing event object
+        event.title_es = f['title_es']
+        event.title_en = f['title_en']
+        event.desc_es  = f['desc_es']
+        event.desc_en  = f['desc_en']
+        event.date     = datetime.strptime(f['date'], '%Y-%m-%d').date()
+        event.time     = f['time']
+        event.tag      = f['tag']
+        # The 'active' checkbox is only in the form data when it's checked.
+        # 'active' in f checks whether the key exists in the form submission.
+        event.active   = 'active' in f
+        # No need to db.session.add() — SQLAlchemy already tracks this object.
+        # Just commit to save the changes.
+        db.session.commit()
+        return redirect(url_for('main.admin_dashboard'))
+
+    # GET — show the form pre-filled with the event's current data
+    return render_template('admin/event_form.html', event=event)
+
+
+@bp.route('/admin/events/<int:event_id>/delete', methods=['POST'])
+@admin_required
+def admin_event_delete(event_id):
+    """
+    POST /admin/events/3/delete
+
+    Deletes event 3 from the database.
+    We use POST (not GET) for destructive actions as a safety measure —
+    browsers can pre-fetch GET links, which could accidentally delete things.
+    The form in the template includes a JS confirm() dialog as a second check.
+    """
+    event = Event.query.get_or_404(event_id)
+    db.session.delete(event)
+    db.session.commit()
+    return redirect(url_for('main.admin_dashboard'))
+
+
+@bp.route('/admin/rsvps')
+@admin_required
+def admin_rsvps():
+    """
+    GET /admin/rsvps
+    GET /admin/rsvps?event_id=3  — Filter to show only RSVPs for event 3
+
+    Full RSVP list page with optional filtering by event.
+    """
+    # request.args reads URL query parameters (?event_id=3)
+    # type=int automatically converts the string "3" to integer 3
+    event_id = request.args.get('event_id', type=int)
+
+    # Start building the query — will add a filter if event_id is provided
+    query = RSVP.query.order_by(RSVP.created_at.desc())
+
+    if event_id:
+        # Add a WHERE event_id = ? clause to the query
+        query = query.filter_by(event_id=event_id)
+
+    rsvps  = query.all()
+    # Also fetch all events for the filter dropdown in the template
+    events = Event.query.order_by(Event.date.desc()).all()
+
+    return render_template(
+        'admin/rsvps.html',
+        rsvps=rsvps,
+        events=events,
+        selected_event=event_id,  # So the template can highlight the active filter
+    )

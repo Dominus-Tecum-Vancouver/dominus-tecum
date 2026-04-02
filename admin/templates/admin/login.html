@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Admin Login — Dominus Tecum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:#5B8A9A;min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .login-card{background:#FAF5EC;border-radius:10px;padding:48px 40px;width:100%;max-width:380px;border-top:4px solid #7A1528;box-shadow:0 20px 60px rgba(26,15,10,.2)}
+    .brand{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:#7A1528;letter-spacing:.2em;text-align:center;margin-bottom:4px}
+    .sub{font-size:10px;color:#6A7E85;letter-spacing:.15em;text-align:center;margin-bottom:32px}
+    label{display:block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;color:#6A7E85;margin-bottom:6px}
+    input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:5px;font-size:14px;outline:none;transition:border .2s;margin-bottom:16px}
+    input:focus{border-color:#5B8A9A}
+    .btn{width:100%;padding:11px;background:#7A1528;color:#F2E8D5;font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:.18em;border:none;border-radius:5px;cursor:pointer;transition:background .2s}
+    .btn:hover{background:#9A1C30}
+    .alert{background:#FAECE7;color:#712B13;padding:10px 14px;border-radius:5px;font-size:13px;margin-bottom:16px;border-left:3px solid #7A1528}
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="brand">DOMINUS TECUM</div>
+    <div class="sub">PANEL DE ADMINISTRACIÓN</div>
+    {% if error %}
+      <div class="alert">{{ error }}</div>
+    {% endif %}
+    <form method="POST">
+      <label>CONTRASEÑA / PASSWORD</label>
+      <input type="password" name="password" placeholder="••••••••" autofocus required/>
+      <button class="btn" type="submit">ENTRAR</button>
+    </form>
+  </div>
+</body>
+</html>
