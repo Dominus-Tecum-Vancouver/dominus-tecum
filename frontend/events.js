@@ -27,7 +27,7 @@
  * Change this to your actual Render URL once deployed.
  * During local development, change it to 'http://localhost:5000'.
  */
-const API_BASE = 'https://your-render-app.onrender.com';
+const API_BASE = 'https://dominus-tecum.onrender.com';
 
 
 // ── Event Loading ─────────────────────────────────────────────────────────────
