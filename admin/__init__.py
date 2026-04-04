@@ -53,7 +53,11 @@ def create_app():
     # the first time the app runs.
     # On Render, the file resets on each deploy, which is fine because
     # Google Sheets is our permanent backup for RSVPs.
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///dominus_tecum.db')
+    db_url = os.environ.get('DATABASE_URL', 'sqlite:///dominus_tecum.db')
+# psycopg3 requires postgresql+psycopg:// prefix instead of postgresql://
+    if db_url.startswith('postgresql://'):
+        db_url = db_url.replace('postgresql://', 'postgresql+psycopg://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 
     # Disables a Flask-SQLAlchemy feature we don't need
     # (tracking every model modification). Keeps things clean and fast.
