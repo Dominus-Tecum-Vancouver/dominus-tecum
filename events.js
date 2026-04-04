@@ -145,8 +145,8 @@ async function loadEvents(lang = 'es') {
  */
 function tagLabel(tag, lang) {
   const labels = {
-    social:  { es: 'SOCIAL',   en: 'SOCIAL'  },
-    faith:   { es: 'FE',       en: 'FAITH'   },
+    social: { es: 'SOCIAL', en: 'SOCIAL' },
+    faith: { es: 'FE', en: 'FAITH' },
     service: { es: 'SERVICIO', en: 'SERVICE' },
   };
   // labels[tag] looks up the tag, ?.[lang] gets the language, ?? falls back
@@ -162,7 +162,7 @@ function tagLabel(tag, lang) {
  * These are module-level variables so both openModal() and submitRSVP()
  * can access them.
  */
-let currentEventId    = null;
+let currentEventId = null;
 let currentEventTitle = '';
 
 /**
@@ -173,7 +173,7 @@ let currentEventTitle = '';
  * @param {string} eventTitle - The event's title (for display)
  */
 function openModal(eventId, eventTitle) {
-  currentEventId    = eventId;
+  currentEventId = eventId;
   currentEventTitle = eventTitle;
   // classList.add() adds a CSS class to the element.
   // The 'open' class in index.html's CSS changes display from 'none' to 'flex',
@@ -209,12 +209,12 @@ function closeModal() {
  */
 async function submitRSVP() {
   // Read the current values from the form inputs by their HTML id
-  const name      = document.getElementById('rsvp-name').value.trim();
-  const email     = document.getElementById('rsvp-email').value.trim();
+  const name = document.getElementById('rsvp-name').value.trim();
+  const email = document.getElementById('rsvp-email').value.trim();
   // Check if the selected option text contains 'primera' (Spanish) or 'first' (English)
   // to determine if this person is attending for the first time
   const firstTime = document.getElementById('rsvp-first').value.includes('primera') ||
-                    document.getElementById('rsvp-first').value.includes('first');
+    document.getElementById('rsvp-first').value.includes('first');
 
   // window.__lang is set by the language toggle in index.html's <script>
   // It tells us which language the user is currently viewing
@@ -246,7 +246,7 @@ async function submitRSVP() {
       body: JSON.stringify({
         name,
         email,
-        event_id:   currentEventId,
+        event_id: currentEventId,
         first_time: firstTime,
       }),
     });
@@ -259,11 +259,7 @@ async function submitRSVP() {
 
     // Show the thank-you message after a short delay (200ms)
     // so the modal close animation finishes first
-    setTimeout(() => alert(
-      lang === 'es'
-        ? `¡Gracias, ${name}! Te esperamos. 🙏`
-        : `Thanks, ${name}! We'll see you there. 🙏`
-    ), 200);
+    showSuccess(name, lang);
 
   } catch (err) {
     // Network error or server crash — show a friendly error message.
@@ -287,6 +283,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load events in the user's current language on page load
   loadEvents(window.__lang || 'es');
 });
+
+function showSuccess(name, lang) {
+  const msg = document.getElementById('success-msg');
+  const text = document.getElementById('success-text');
+  text.textContent = lang === 'es'
+    ? `¡Gracias, ${name}! Te esperamos este viernes. 🙏`
+    : `Thanks, ${name}! We'll see you this Friday. 🙏`;
+  msg.style.display = 'flex';
+  setTimeout(() => msg.style.display = 'none', 5000);
+}
 
 /**
  * Expose loadEvents globally so the language toggle button in index.html

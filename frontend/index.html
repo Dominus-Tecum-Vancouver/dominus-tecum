@@ -1167,10 +1167,16 @@
     function openModal() { document.getElementById('overlay').classList.add('open'); }
     function closeModal() { document.getElementById('overlay').classList.remove('open'); }
     document.getElementById('overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
-    function submitRSVP() { const n = document.getElementById('rsvp-name').value.trim(); if (!n) { alert(lang === 'es' ? 'Por favor ingresa tu nombre.' : 'Please enter your name.'); return; } closeModal(); setTimeout(() => alert(lang === 'es' ? `¡Gracias, ${n}! Te esperamos. 🙏` : `Thanks, ${n}! We'll see you there. 🙏`), 200); }
   </script>
   <script>window.__lang = "es";</script>
   <script src="events.js" defer></script>
+  <div id="success-msg" style="display:none;position:fixed;bottom:24px;left:50%;
+    transform:translateX(-50%);background:var(--steel);color:white;
+    padding:16px 28px;border-radius:8px;font-family:'Cinzel',serif;
+    font-size:11px;letter-spacing:.12em;z-index:9999;
+    box-shadow:0 8px 32px rgba(26,15,10,.2);border-left:4px solid var(--burgundy)">
+    <span id="success-text"></span>
+  </div>
 </body>
 
 </html>
