@@ -11,16 +11,16 @@
       FILTRAR POR EVENTO
     </label>
     <select name="event_id" onchange="this.form.submit()"
-            style="padding:7px 10px;border:1px solid #ddd;border-radius:5px;font-size:13px;color:#2A1810;flex:1;max-width:320px">
+      style="padding:7px 10px;border:1px solid #ddd;border-radius:5px;font-size:13px;color:#2A1810;flex:1;max-width:320px">
       <option value="">— Todos los eventos —</option>
       {% for e in events %}
-        <option value="{{ e.id }}" {{ 'selected' if selected_event == e.id }}>
-          {{ e.date.strftime('%d %b') }} · {{ e.title_es }}
-        </option>
+      <option value="{{ e.id }}" {{ 'selected' if selected_event==e.id }}>
+        {{ e.date.strftime('%d %b') }} · {{ e.title_es }}
+      </option>
       {% endfor %}
     </select>
     {% if selected_event %}
-      <a href="/admin/rsvps" class="btn btn-outline btn-sm">Limpiar</a>
+    <a href="/admin/rsvps" class="btn btn-outline btn-sm">Limpiar</a>
     {% endif %}
   </form>
 </div>
@@ -50,9 +50,9 @@
         <td style="font-size:12px">{{ r.event.title_es }}</td>
         <td>
           {% if r.first_time %}
-            <span class="badge badge-first">SÍ ✦</span>
+          <span class="badge badge-first">SÍ ✦</span>
           {% else %}
-            <span style="color:#ccc">—</span>
+          <span style="color:#ccc">—</span>
           {% endif %}
         </td>
       </tr>

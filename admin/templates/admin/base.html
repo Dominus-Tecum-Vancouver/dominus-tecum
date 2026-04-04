@@ -1,68 +1,302 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Dominus Tecum</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
   <style>
-    :root{--steel:#5B8A9A;--steel-bg:#EBF4F7;--burgundy:#7A1528;--cream:#F2E8D5;--parchment:#FAF5EC;--text:#2A1810;--muted:#6A7E85}
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'DM Sans',sans-serif;background:var(--parchment);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+    :root {
+      --steel: #5B8A9A;
+      --steel-bg: #EBF4F7;
+      --burgundy: #7A1528;
+      --cream: #F2E8D5;
+      --parchment: #FAF5EC;
+      --text: #2A1810;
+      --muted: #6A7E85
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--parchment);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
     /* NAV */
-    .admin-nav{background:var(--steel);padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
-    .admin-nav .brand{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--cream);letter-spacing:.2em}
-    .admin-nav .brand span{font-size:9px;font-weight:300;color:rgba(255,255,255,.45);letter-spacing:.15em;display:block}
-    .nav-links{display:flex;gap:24px;list-style:none}
-    .nav-links a{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s}
-    .nav-links a:hover,.nav-links a.active{color:var(--cream)}
+    .admin-nav {
+      background: var(--steel);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .admin-nav .brand {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cream);
+      letter-spacing: .2em
+    }
+
+    .admin-nav .brand span {
+      font-size: 9px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, .45);
+      letter-spacing: .15em;
+      display: block
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none
+    }
+
+    .nav-links a {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: .12em;
+      color: rgba(255, 255, 255, .6);
+      text-decoration: none;
+      transition: color .2s
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--cream)
+    }
+
     /* LAYOUT */
-    .admin-main{flex:1;padding:40px 32px;max-width:1100px;margin:0 auto;width:100%}
-    .page-title{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:.05em}
-    .page-sub{font-size:13px;color:var(--muted);margin-bottom:32px}
+    .admin-main {
+      flex: 1;
+      padding: 40px 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%
+    }
+
+    .page-title {
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: .05em
+    }
+
+    .page-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px
+    }
+
     /* CARDS */
-    .card{background:white;border-radius:10px;box-shadow:0 2px 12px rgba(91,138,154,0.08);padding:24px;margin-bottom:20px}
-    .card-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;color:var(--steel);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--steel-bg)}
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(91, 138, 154, 0.08);
+      padding: 24px;
+      margin-bottom: 20px
+    }
+
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      letter-spacing: .1em;
+      color: var(--steel);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--steel-bg)
+    }
+
     /* BUTTONS */
-    .btn{display:inline-block;padding:9px 20px;font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:.14em;border:none;border-radius:5px;cursor:pointer;text-decoration:none;transition:all .2s}
-    .btn-primary{background:var(--steel);color:white}.btn-primary:hover{background:#4A7A8A}
-    .btn-danger{background:var(--burgundy);color:var(--cream)}.btn-danger:hover{background:#9A1C30}
-    .btn-outline{background:transparent;color:var(--steel);border:1px solid var(--steel)}.btn-outline:hover{background:var(--steel-bg)}
-    .btn-sm{padding:5px 12px;font-size:9px}
+    .btn {
+      display: inline-block;
+      padding: 9px 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s
+    }
+
+    .btn-primary {
+      background: var(--steel);
+      color: white
+    }
+
+    .btn-primary:hover {
+      background: #4A7A8A
+    }
+
+    .btn-danger {
+      background: var(--burgundy);
+      color: var(--cream)
+    }
+
+    .btn-danger:hover {
+      background: #9A1C30
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--steel);
+      border: 1px solid var(--steel)
+    }
+
+    .btn-outline:hover {
+      background: var(--steel-bg)
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 9px
+    }
+
     /* TABLE */
-    table{width:100%;border-collapse:collapse;font-size:13px}
-    th{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;color:var(--muted);text-align:left;padding:8px 12px;border-bottom:2px solid var(--steel-bg)}
-    td{padding:10px 12px;border-bottom:1px solid #f0ece4;vertical-align:middle}
-    tr:hover td{background:#fafaf7}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px
+    }
+
+    th {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: .15em;
+      color: var(--muted);
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 2px solid var(--steel-bg)
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0ece4;
+      vertical-align: middle
+    }
+
+    tr:hover td {
+      background: #fafaf7
+    }
+
     /* FORMS */
-    .form-group{margin-bottom:18px}
-    .form-group label{display:block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;color:var(--muted);margin-bottom:6px}
-    .form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:white;outline:none;transition:border .2s}
-    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--steel)}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-group {
+      margin-bottom: 18px
+    }
+
+    .form-group label {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: .18em;
+      color: var(--muted);
+      margin-bottom: 6px
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: white;
+      outline: none;
+      transition: border .2s
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--steel)
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
     /* BADGES */
-    .badge{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.08em}
-    .badge-social{background:#EBF4F7;color:#2A5A6A}
-    .badge-faith{background:#f0e8ff;color:#5B2A8A}
-    .badge-service{background:#e8f5e9;color:#1B5E20}
-    .badge-first{background:#FFF3E0;color:#E65100}
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      letter-spacing: .08em
+    }
+
+    .badge-social {
+      background: #EBF4F7;
+      color: #2A5A6A
+    }
+
+    .badge-faith {
+      background: #f0e8ff;
+      color: #5B2A8A
+    }
+
+    .badge-service {
+      background: #e8f5e9;
+      color: #1B5E20
+    }
+
+    .badge-first {
+      background: #FFF3E0;
+      color: #E65100
+    }
+
     /* ALERTS */
-    .alert{padding:10px 16px;border-radius:5px;font-size:13px;margin-bottom:16px}
-    .alert-error{background:#FAECE7;color:#712B13;border-left:3px solid var(--burgundy)}
+    .alert {
+      padding: 10px 16px;
+      border-radius: 5px;
+      font-size: 13px;
+      margin-bottom: 16px
+    }
+
+    .alert-error {
+      background: #FAECE7;
+      color: #712B13;
+      border-left: 3px solid var(--burgundy)
+    }
   </style>
 </head>
+
 <body>
-<nav class="admin-nav">
-  <div class="brand">DOMINUS TECUM <span>PANEL DE ADMINISTRACIÓN</span></div>
-  <ul class="nav-links">
-    <li><a href="/admin" class="{{ 'active' if request.endpoint == 'main.admin_dashboard' }}">Dashboard</a></li>
-    <li><a href="/admin/rsvps" class="{{ 'active' if request.endpoint == 'main.admin_rsvps' }}">RSVPs</a></li>
-    <li><a href="/admin/events/new">+ Evento</a></li>
-    <li><a href="/admin/logout">Salir</a></li>
-  </ul>
-</nav>
-<main class="admin-main">
-  {% block content %}{% endblock %}
-</main>
+  <nav class="admin-nav">
+    <div class="brand">DOMINUS TECUM <span>PANEL DE ADMINISTRACIÓN</span></div>
+    <ul class="nav-links">
+      <li><a href="/admin" class="{{ 'active' if request.endpoint == 'main.admin_dashboard' }}">Panel</a></li>
+      <li><a href="/admin/rsvps" class="{{ 'active' if request.endpoint == 'main.admin_rsvps' }}">RSVPs</a></li>
+      <li><a href="/admin/events/new">+ Nuevo Evento</a></li>
+      <li><a href="/admin/logout">Salir</a></li>
+    </ul>
+  </nav>
+  <main class="admin-main">
+    {% block content %}{% endblock %}
+  </main>
 </body>
+
 </html>

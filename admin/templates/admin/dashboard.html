@@ -1,7 +1,7 @@
 {% extends 'admin/base.html' %}
 {% block content %}
 
-<div class="page-title">Dashboard</div>
+<div class="page-title">Panel Principal</div>
 <div class="page-sub">Bienvenido al panel de Dominus Tecum</div>
 
 <!-- Stats row -->
@@ -31,7 +31,13 @@
   <table>
     <thead>
       <tr>
-        <th>Fecha</th><th>Título (ES)</th><th>Hora</th><th>Tipo</th><th>RSVPs</th><th>Estado</th><th>Acciones</th>
+        <th>Fecha</th>
+        <th>Título (ES)</th>
+        <th>Hora</th>
+        <th>Tipo</th>
+        <th>RSVPs</th>
+        <th>Estado</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -44,23 +50,25 @@
         <td>{{ event.rsvps|length }}</td>
         <td>
           {% if event.active %}
-            <span style="color:#1B5E20;font-size:11px">● Activo</span>
+          <span style="color:#1B5E20;font-size:11px">● Activo</span>
           {% else %}
-            <span style="color:#999;font-size:11px">○ Inactivo</span>
+          <span style="color:#999;font-size:11px">○ Inactivo</span>
           {% endif %}
         </td>
         <td style="white-space:nowrap">
           <a href="/admin/events/{{ event.id }}/edit" class="btn btn-outline btn-sm">Editar</a>
           <form method="POST" action="/admin/events/{{ event.id }}/delete" style="display:inline"
-                onsubmit="return confirm('¿Eliminar este evento?')">
+            onsubmit="return confirm('¿Eliminar este evento?')">
             <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
           </form>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="7" style="text-align:center;color:#999;padding:24px">
-        No hay eventos. <a href="/admin/events/new" style="color:#5B8A9A">Crea el primero.</a>
-      </td></tr>
+      <tr>
+        <td colspan="7" style="text-align:center;color:#999;padding:24px">
+          No hay eventos. <a href="/admin/events/new" style="color:#5B8A9A">Crea el primero.</a>
+        </td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
@@ -74,7 +82,13 @@
   </div>
   <table>
     <thead>
-      <tr><th>Fecha</th><th>Nombre</th><th>Email</th><th>Evento</th><th>Primera vez</th></tr>
+      <tr>
+        <th>Fecha</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Evento</th>
+        <th>Primera vez</th>
+      </tr>
     </thead>
     <tbody>
       {% for r in rsvps[:10] %}
@@ -85,12 +99,14 @@
         <td>{{ r.event.title_es }}</td>
         <td>
           {% if r.first_time %}
-            <span class="badge badge-first">SÍ ✦</span>
+          <span class="badge badge-first">SÍ ✦</span>
           {% else %}—{% endif %}
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="5" style="text-align:center;color:#999;padding:24px">Aún no hay RSVPs.</td></tr>
+      <tr>
+        <td colspan="5" style="text-align:center;color:#999;padding:24px">Aún no hay RSVPs.</td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
