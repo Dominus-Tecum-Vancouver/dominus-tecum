@@ -69,7 +69,7 @@ class Event(db.Model):
     # and rsvp.event to get the event an RSVP belongs to (backref).
     # lazy=True means RSVPs are only loaded from the DB when accessed,
     # not eagerly fetched every time we load an event.
-    rsvps = db.relationship('RSVP', backref='event', lazy=True)
+    rsvps = db.relationship('RSVP', backref='event', lazy=True, cascade='all, delete-orphan')
 
     def to_dict(self, lang='es'):
         """
