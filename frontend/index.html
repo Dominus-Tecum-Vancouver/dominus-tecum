@@ -618,6 +618,11 @@
       overflow: hidden
     }
 
+    .gallery-section .sw {
+      padding-top: 48px;
+      padding-bottom: 48px
+    }
+
     .gallery-section .section-label {
       color: rgba(255, 255, 255, .5)
     }
@@ -1067,7 +1072,7 @@
   <!-- FOOTER -->
   <footer>
     <div class="footer-top">
-      <div>
+      <div style="display:flex;align-items:center;gap:14px">
         <svg class="footer-emblem" viewBox="0 0 80 80" fill="none">
           <ellipse cx="40" cy="40" rx="36" ry="36" stroke="rgba(255,255,255,0.35)" stroke-width="1.2" />
           <ellipse cx="40" cy="40" rx="30" ry="30" stroke="rgba(255,255,255,0.15)" stroke-width="0.6" />
@@ -1076,11 +1081,31 @@
           <line x1="32" y1="38" x2="48" y2="38" stroke="#FAF5EC" stroke-width="1.5" opacity="0.7" />
           <circle cx="40" cy="26" r="1.5" fill="#C4AA8A" opacity="0.8" />
         </svg>
-        <div class="footer-brand"><strong>DOMINUS TECUM</strong>
-          <p>Holy Rosary Cathedral<br>650 Richards St, Vancouver BC<br>dominustecumvancouver@gmail.com</p>
+        <div class="footer-brand">
+          <strong>DOMINUS TECUM</strong>
+          <p>Holy Rosary Cathedral Hall<br>650 Richards St, Vancouver BC<br>dominustecumvancouver@gmail.com</p>
         </div>
       </div>
-      <ul class="footer-nav">
+
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:6px;text-align:center">
+        <p style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;color:var(--muted);margin-bottom:4px">
+          SÍGUENOS / FOLLOW US</p>
+        <a href="https://instagram.com/dominustecum.vancouver" target="_blank"
+          style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(122,21,40,0.15);border:1px solid rgba(122,21,40,0.3);border-radius:5px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:var(--burgundy);text-decoration:none;transition:all .2s"
+          onmouseover="this.style.background='var(--burgundy)';this.style.color='var(--cream)'"
+          onmouseout="this.style.background='rgba(122,21,40,0.15)';this.style.color='var(--burgundy)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+          </svg>
+          @DOMINUSTECUM.VANCOUVER
+        </a>
+        <p style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;color:var(--muted);margin-top:8px">
+          MIÉRCOLES · 7:00 – 9:00 PM</p>
+      </div>
+
+      <ul class="footer-nav" style="justify-content:center">
         <li><a onclick="goTo('body')" data-es="INICIO" data-en="HOME">INICIO</a></li>
         <li><a onclick="goTo('#events')" data-es="EVENTOS" data-en="EVENTS">EVENTOS</a></li>
         <li><a onclick="goTo('#newhere')" data-es="¿NUEVO AQUÍ?" data-en="NEW HERE?">¿NUEVO AQUÍ?</a></li>
