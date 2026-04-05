@@ -256,10 +256,12 @@ async function submitRSVP() {
 
     // Close the modal first
     closeModal();
-
-    // Show the thank-you message after a short delay (200ms)
-    // so the modal close animation finishes first
-    showSuccess(name, lang);
+    if (data.status === 'duplicate') {
+      showDuplicate(name, lang);
+    }
+    else {
+      showSuccess(name, lang);
+    }
 
   } catch (err) {
     // Network error or server crash — show a friendly error message.
@@ -292,6 +294,20 @@ function showSuccess(name, lang) {
     : `Thanks, ${name}! We'll see you this Friday. 🙏`;
   msg.style.display = 'flex';
   setTimeout(() => msg.style.display = 'none', 5000);
+}
+
+function showDuplicate(name, lang) {
+  const msg = document.getElementById('success-msg');
+  const text = document.getElementById('success-text');
+  text.textContent = lang === 'es'
+    ? `¡${name}, ya tienes un lugar reservado para este evento! 🙏`
+    : `${name}, you already have a spot for this event! 🙏`;
+  msg.style.background = 'var(--burgundy)';
+  msg.style.display = 'flex';
+  setTimeout(() => {
+    msg.style.display = 'none';
+    msg.style.background = 'var(--steel)';
+  }, 5000);
 }
 
 /**

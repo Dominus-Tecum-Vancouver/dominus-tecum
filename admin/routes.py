@@ -152,6 +152,14 @@ def api_rsvp():
         # 404 Not Found — event doesn't exist or has been archived
         return jsonify({'error': 'Event not found'}), 404
 
+    # Check for duplicate RSVP — same email can't RSVP twice for the same event
+    existing = RSVP.query.filter_by(email=email, event_id=event_id).first()
+    if existing:
+        return jsonify({
+            'status': 'duplicate',
+            'message': f'¡{name}, ya tienes un lugar reservado para este evento!'
+        }), 200
+
     # ── Step 1: Save to SQLite ──────────────────────────────────────────────
     # Create a new RSVP object (this doesn't save yet — just creates it in memory)
     rsvp = RSVP(name=name, email=email, event_id=event_id, first_time=first_time)
