@@ -617,69 +617,6 @@
       background: var(--parchment-dark)
     }
 
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: 180px 180px;
-      gap: 5px
-    }
-
-    .g-item {
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      transition: transform .3s
-    }
-
-    .g-item:hover {
-      transform: scale(1.02);
-      z-index: 2
-    }
-
-    .g-item:first-child {
-      grid-column: span 2;
-      grid-row: span 2;
-      border-radius: 6px
-    }
-
-    .g-1 {
-      background: linear-gradient(145deg, var(--burgundy), #4A0A18)
-    }
-
-    .g-2 {
-      background: linear-gradient(145deg, var(--steel), #2A5A6A)
-    }
-
-    .g-3 {
-      background: linear-gradient(145deg, var(--burgundy-light), var(--burgundy))
-    }
-
-    .g-4 {
-      background: linear-gradient(145deg, var(--steel-light), var(--steel))
-    }
-
-    .g-5 {
-      background: linear-gradient(145deg, var(--burgundy), #3A0A14)
-    }
-
-    .g-icon {
-      font-size: 26px;
-      opacity: .25
-    }
-
-    .g-label {
-      position: absolute;
-      bottom: 10px;
-      left: 11px;
-      font-family: 'Cinzel', serif;
-      font-size: 8px;
-      letter-spacing: .12em;
-      color: rgba(255, 255, 255, .75)
-    }
-
     /* FOOTER — steel */
     footer {
       background: var(--parchment-dark);
@@ -1091,28 +1028,13 @@
     <p class="section-intro" data-es="Aquí se forman amistades reales. Esta es nuestra familia en Vancouver."
       data-en="Real friendships are formed here. This is our family in Vancouver.">Aquí se forman amistades reales. Esta
       es nuestra familia en Vancouver.</p>
-    <div class="gallery-grid">
-      <div class="g-item g-1">
-        <div class="g-icon">📸</div>
-        <div class="g-label" data-es="CONVIVENCIA · MARZO" data-en="SOCIAL NIGHT · MARCH">CONVIVENCIA · MARZO</div>
-      </div>
-      <div class="g-item g-2">
-        <div class="g-icon">🙏</div>
-        <div class="g-label" data-es="RETIRO · FEBRERO" data-en="RETREAT · FEBRUARY">RETIRO · FEBRERO</div>
-      </div>
-      <div class="g-item g-3">
-        <div class="g-icon">🎶</div>
-        <div class="g-label" data-es="MISA ESPECIAL" data-en="SPECIAL MASS">MISA ESPECIAL</div>
-      </div>
-      <div class="g-item g-4">
-        <div class="g-icon">🤝</div>
-        <div class="g-label" data-es="VOLUNTARIADO" data-en="VOLUNTEER">VOLUNTARIADO</div>
-      </div>
-      <div class="g-item g-5">
-        <div class="g-icon">✨</div>
-        <div class="g-label" data-es="NAVIDAD · DICIEMBRE" data-en="CHRISTMAS · DECEMBER">NAVIDAD · DICIEMBRE</div>
-      </div>
-    </div>
+    <behold-widget feed-id="if8pBrDUf9tL5dY43FDR" style="max-width:100%"></behold-widget>
+    <script>
+      (() => {
+        const d = document, s = d.createElement("script"); s.type = "module";
+        s.src = "https://w.behold.so/widget.js"; d.head.append(s);
+      })();
+    </script>
   </section>
 
   <!-- FOOTER -->
