@@ -174,7 +174,7 @@ def send_rsvp_confirmation(name: str, email: str, event_title: str) -> bool:
                     border-left:3px solid #7A1528;border-radius:4px">
           <p style="margin:0;font-size:13px;color:#2A5A6A">
             📍 Holy Rosary Cathedral<br>
-            646 Richards St, Vancouver BC
+            650 Richards St, Vancouver BC
           </p>
         </div>
 
@@ -239,3 +239,64 @@ def send_rsvp_notification(name: str, email: str,
     """
     # Send TO the group Gmail — leaders will see this in their inbox
     return send_email(GMAIL_ADDRESS, subject, html)
+
+def send_event_reminder(name: str, email: str, event_title: str,
+                        event_date: str, event_time: str,
+                        reminder_type: str) -> bool:
+    """
+    Sends a bilingual reminder email to someone who RSVPed for an upcoming event.
+    Called by the cron job — once the evening before (day_before)
+    and once the morning of the event (morning_of).
+    """
+    if reminder_type == 'day_before':
+        subject = f'¡Nos vemos mañana, {name}! / See you tomorrow!'
+        timing_es = '¡Nos vemos <strong>mañana</strong>!'
+        timing_en = 'See you <strong>tomorrow</strong>!'
+        sub_es = 'Recuerda que tienes un lugar reservado para este evento.'
+        sub_en = 'Just a reminder that you have a spot reserved for this event.'
+    else:
+        subject = f'¡Hoy es el día, {name}! / Today is the day!'
+        timing_es = '¡<strong>Hoy</strong> es el día!'
+        timing_en = '<strong>Today</strong> is the day!'
+        sub_es = 'Te esperamos esta noche con mucho gusto.'
+        sub_en = 'We look forward to seeing you tonight!'
+
+    html = f"""
+    <div style="font-family:'Georgia',serif;max-width:520px;margin:0 auto;color:#2A1810">
+      <div style="background:#5B8A9A;padding:28px 32px;text-align:center">
+        <h1 style="color:#F2E8D5;font-size:22px;letter-spacing:3px;margin:0">DOMINUS TECUM</h1>
+        <p style="color:rgba(255,255,255,0.65);font-size:13px;margin:6px 0 0;font-style:italic">
+          Holy Rosary Cathedral Hall · Vancouver
+        </p>
+      </div>
+      <div style="padding:32px;background:#FAF5EC">
+        <p style="font-size:18px;margin:0 0 8px">Hola {name} / Hi {name},</p>
+        <p style="font-size:20px;font-weight:bold;color:#7A1528;margin:0 0 4px">{timing_es}</p>
+        <p style="font-size:20px;font-weight:bold;color:#5B8A9A;margin:0 0 16px">{timing_en}</p>
+        <p style="color:#5C3D2E;line-height:1.8;margin:0 0 20px">
+          {sub_es}<br>{sub_en}
+        </p>
+        <div style="background:#EBF4F7;border-left:4px solid #7A1528;
+                    border-radius:4px;padding:18px 20px;margin-bottom:20px">
+          <p style="margin:0 0 8px;font-size:16px;font-weight:bold;color:#2A1810">
+            {event_title}
+          </p>
+          <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
+            📅 {event_date}<br>
+            🕖 {event_time}<br>
+            📍 Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC
+          </p>
+        </div>
+        <p style="color:#7A6555;font-size:13px">
+          ¿Preguntas? / Questions?<br>
+          <a href="mailto:{GMAIL_ADDRESS}" style="color:#5B8A9A">{GMAIL_ADDRESS}</a>
+        </p>
+      </div>
+      <div style="background:#EDE3CF;padding:14px;text-align:center">
+        <p style="margin:0;font-size:10px;letter-spacing:2px;color:#A08B72">
+          © DOMINUS TECUM · HOLY ROSARY CATHEDRAL · VANCOUVER
+        </p>
+      </div>
+    </div>
+    """
+    return send_email(email, subject, html)

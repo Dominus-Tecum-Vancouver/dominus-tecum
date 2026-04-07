@@ -373,3 +373,111 @@ def admin_rsvps():
         events=events,
         selected_event=event_id,  # So the template can highlight the active filter
     )
+
+# ── Cron / Reminder Routes ─────────────────────────────────────────────────────
+
+import os as _os
+from .gmail_service import send_event_reminder as _send_reminder
+
+
+def _check_cron_secret():
+    """
+    Verifies the Authorization header matches our CRON_SECRET env var.
+    Prevents random people from triggering mass emails.
+    """
+    secret = _os.environ.get('CRON_SECRET', '')
+    auth   = request.headers.get('Authorization', '')
+    return auth in (secret, f'Bearer {secret}')
+
+
+def _send_reminders_for_offset(day_offset: int, reminder_type: str) -> dict:
+    """
+    Finds events happening `day_offset` days from today and emails
+    everyone who RSVPed.
+      day_offset 1 = tomorrow (evening before reminder)
+      day_offset 0 = today    (morning of reminder)
+    """
+    from datetime import date, timedelta
+
+    target_date = date.today() + timedelta(days=day_offset)
+
+    events = Event.query.filter_by(active=True, date=target_date).all()
+
+    sent_count   = 0
+    failed_count = 0
+
+    for event in events:
+        # Format date in Spanish e.g. "miércoles 15 de abril"
+        day_names = {
+            'Monday': 'lunes', 'Tuesday': 'martes', 'Wednesday': 'miércoles',
+            'Thursday': 'jueves', 'Friday': 'viernes',
+            'Saturday': 'sábado', 'Sunday': 'domingo'
+        }
+        month_names = {
+            'January': 'enero', 'February': 'febrero', 'March': 'marzo',
+            'April': 'abril', 'May': 'mayo', 'June': 'junio',
+            'July': 'julio', 'August': 'agosto', 'September': 'septiembre',
+            'October': 'octubre', 'November': 'noviembre', 'December': 'diciembre'
+        }
+        day_name   = day_names.get(target_date.strftime('%A'), target_date.strftime('%A'))
+        month_name = month_names.get(target_date.strftime('%B'), target_date.strftime('%B'))
+        event_date = f"{day_name} {target_date.day} de {month_name}"
+
+        for rsvp in event.rsvps:
+            success = _send_reminder(
+                name          = rsvp.name,
+                email         = rsvp.email,
+                event_title   = event.title_es,
+                event_date    = event_date,
+                event_time    = event.time,
+                reminder_type = reminder_type,
+            )
+            if success:
+                sent_count += 1
+            else:
+                failed_count += 1
+
+    return {
+        'target_date':  str(target_date),
+        'events_found': len(events),
+        'sent':         sent_count,
+        'failed':       failed_count,
+    }
+
+
+@bp.route('/cron/remind-day-before', methods=['POST'])
+def cron_remind_day_before():
+    """Called by cron-job.org every day at 6:00 PM Pacific."""
+    if not _check_cron_secret():
+        return jsonify({'error': 'Unauthorized'}), 401
+    result = _send_reminders_for_offset(day_offset=1, reminder_type='day_before')
+    print(f'[cron] day-before reminders: {result}')
+    return jsonify({'status': 'ok', **result})
+
+
+@bp.route('/cron/remind-morning-of', methods=['POST'])
+def cron_remind_morning_of():
+    """Called by cron-job.org every day at 9:00 AM Pacific."""
+    if not _check_cron_secret():
+        return jsonify({'error': 'Unauthorized'}), 401
+    result = _send_reminders_for_offset(day_offset=0, reminder_type='morning_of')
+    print(f'[cron] morning-of reminders: {result}')
+    return jsonify({'status': 'ok', **result})
+
+
+@bp.route('/admin/reminders', methods=['GET', 'POST'])
+@admin_required
+def admin_reminders():
+    """Manual reminder trigger page — useful for testing."""
+    message = None
+    if request.method == 'POST':
+        reminder_type = request.form.get('type', 'day_before')
+        day_offset    = 1 if reminder_type == 'day_before' else 0
+        result        = _send_reminders_for_offset(day_offset, reminder_type)
+        if result['events_found'] == 0:
+            message = {'type': 'info',
+                       'text': f"No hay eventos {'mañana' if day_offset == 1 else 'hoy'}."}
+        else:
+            message = {'type': 'success',
+                       'text': f"Enviados: {result['sent']} recordatorios. Fallidos: {result['failed']}."}
+    return render_template('admin/reminders.html', message=message)
