@@ -311,8 +311,8 @@ def send_rsvp_notification(name: str, email: str,
 
 
 def send_event_reminder(name: str, email: str, event_title: str,
-                        event_date: str, event_time: str,
-                        reminder_type: str) -> bool:
+                        event_date_es: str, event_date_en: str,
+                        event_time: str, reminder_type: str) -> bool:
     """
     Sends a bilingual reminder email to someone who RSVPed for an upcoming event.
 
@@ -346,15 +346,24 @@ def send_event_reminder(name: str, email: str, event_title: str,
         heading_en = '<strong>Today</strong> is the day!'
         body_en    = 'We look forward to seeing you tonight!'
 
-    # Event-specific details box — shows title, date, time, location.
-    # This is different from _location_box() because it includes the
-    # specific event name, date and time rather than the generic schedule.
-    event_box = f"""
+    # Spanish event box
+    event_box_es = f"""
     <div style="padding:16px;background:#EBF4F7;border-left:3px solid #7A1528;
                 border-radius:4px;margin-bottom:16px">
       <p style="margin:0 0 6px;font-size:15px;font-weight:bold;color:#2A1810">{event_title}</p>
       <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
-        &#128197; {event_date} &middot; {event_time}<br>
+        &#128197; {event_date_es} &middot; {event_time}<br>
+        &#128205; Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC
+      </p>
+    </div>"""
+
+    # English event box
+    event_box_en = f"""
+    <div style="padding:16px;background:#EBF4F7;border-left:3px solid #7A1528;
+                border-radius:4px;margin-bottom:16px">
+      <p style="margin:0 0 6px;font-size:15px;font-weight:bold;color:#2A1810">{event_title}</p>
+      <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
+        &#128197; {event_date_en} &middot; {event_time}<br>
         &#128205; Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC
       </p>
     </div>"""
@@ -370,7 +379,7 @@ def send_event_reminder(name: str, email: str, event_title: str,
         <!-- Large heading gives the email immediate visual impact -->
         <p style="font-size:20px;font-weight:bold;color:#7A1528;margin:0 0 8px">{heading_es}</p>
         <p style="color:#5C3D2E;line-height:1.8;margin:0 0 16px">{body_es}</p>
-        {event_box}
+        {event_box_es}
         <p style="color:#5C3D2E;font-size:13px;margin:0">
           Si no puedes asistir, cont&aacute;ctanos:
           <a href="mailto:{GMAIL_ADDRESS}" style="color:#5B8A9A">{GMAIL_ADDRESS}</a>
@@ -385,7 +394,7 @@ def send_event_reminder(name: str, email: str, event_title: str,
         <p style="font-size:18px;margin:0 0 8px">Hi {name},</p>
         <p style="font-size:20px;font-weight:bold;color:#7A1528;margin:0 0 8px">{heading_en}</p>
         <p style="color:#5C3D2E;line-height:1.8;margin:0 0 16px">{body_en}</p>
-        {event_box}
+        {event_box_en}
         <p style="color:#5C3D2E;font-size:13px;margin:0">
           Can&apos;t make it? Let us know:
           <a href="mailto:{GMAIL_ADDRESS}" style="color:#5B8A9A">{GMAIL_ADDRESS}</a>

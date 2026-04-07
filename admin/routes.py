@@ -419,16 +419,21 @@ def _send_reminders_for_offset(day_offset: int, reminder_type: str) -> dict:
             'July': 'julio', 'August': 'agosto', 'September': 'septiembre',
             'October': 'octubre', 'November': 'noviembre', 'December': 'diciembre'
         }
-        day_name   = day_names.get(target_date.strftime('%A'), target_date.strftime('%A'))
-        month_name = month_names.get(target_date.strftime('%B'), target_date.strftime('%B'))
-        event_date = f"{day_name} {target_date.day} de {month_name}"
+        # Spanish date e.g. "martes 7 de abril"
+        day_name_es   = day_names.get(target_date.strftime('%A'), target_date.strftime('%A'))
+        month_name_es = month_names.get(target_date.strftime('%B'), target_date.strftime('%B'))
+        event_date_es = f"{day_name_es} {target_date.day} de {month_name_es}"
+
+        # English date e.g. "Tuesday, April 7"
+        event_date_en = target_date.strftime('%A, %B %-d') if hasattr(target_date, 'strftime') else str(target_date)
 
         for rsvp in event.rsvps:
             success = _send_reminder(
                 name          = rsvp.name,
                 email         = rsvp.email,
                 event_title   = event.title_es,
-                event_date    = event_date,
+                event_date_es = event_date_es,
+                event_date_en = event_date_en,
                 event_time    = event.time,
                 reminder_type = reminder_type,
             )

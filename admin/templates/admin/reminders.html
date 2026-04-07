@@ -49,44 +49,4 @@
 
 </div>
 
-<!-- Cron setup guide -->
-<div class="card">
-    <div class="card-title">Configuración automática (cron-job.org)</div>
-    <p style="font-size:13px;color:#6A7E85;margin-bottom:16px;line-height:1.7">
-        Para que los recordatorios se envíen automáticamente cada día,
-        configura estos dos trabajos en <strong>cron-job.org</strong>:
-    </p>
-    <table>
-        <thead>
-            <tr>
-                <th>Recordatorio</th>
-                <th>URL</th>
-                <th>Método</th>
-                <th>Horario</th>
-                <th>Header</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="font-weight:500">Noche anterior</td>
-                <td style="font-family:monospace;font-size:12px">
-                    https://dominus-tecum.onrender.com/cron/remind-day-before
-                </td>
-                <td>POST</td>
-                <td>18:00 Pacific (01:00 UTC)</td>
-                <td style="font-family:monospace;font-size:12px">Authorization: [CRON_SECRET]</td>
-            </tr>
-            <tr>
-                <td style="font-weight:500">Mañana del evento</td>
-                <td style="font-family:monospace;font-size:12px">
-                    https://dominus-tecum.onrender.com/cron/remind-morning-of
-                </td>
-                <td>POST</td>
-                <td>09:00 Pacific (16:00 UTC)</td>
-                <td style="font-family:monospace;font-size:12px">Authorization: [CRON_SECRET]</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
 {% endblock %}
