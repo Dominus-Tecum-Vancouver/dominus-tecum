@@ -17,6 +17,15 @@ How Gmail API authentication works:
   3. Every time we send an email, we load these credentials and
      auto-refresh the access token if it's expired
   4. The Gmail API then accepts our request and sends the email
+
+Email layout philosophy:
+  All member-facing emails follow a Spanish-first layout:
+    1. ESPAÑOL section — full message in Spanish
+    2. Visual divider
+    3. ENGLISH section — full message in English
+  This is easier to read than mixing languages line by line.
+  The group notification email (to leaders) stays bilingual inline
+  since it's just a quick internal scan.
 """
 
 import base64   # Used to encode email content for the API
@@ -37,7 +46,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 # Read the group's Gmail address from environment variables.
 # os.environ.get() returns the second argument if the key doesn't exist,
 # so this won't crash if GMAIL_ADDRESS isn't set yet during development.
-GMAIL_ADDRESS = os.environ.get('GMAIL_ADDRESS', 'dominustecum@gmail.com')
+GMAIL_ADDRESS = os.environ.get('GMAIL_ADDRESS', 'dominustecumvancouver@gmail.com')
 
 
 def get_gmail_service():
@@ -130,68 +139,125 @@ def send_email(to: str, subject: str, html_body: str) -> bool:
         return False
 
 
+# ── Shared HTML building blocks ────────────────────────────────────────────────
+#
+# These helper functions return HTML snippets that are reused across all
+# member-facing emails. Centralizing them means if we ever want to update
+# the branding (e.g. new address, new color), we only change it in one place.
+
+def _email_header():
+    """Branded steel-blue header used at the top of every member email."""
+    return """
+    <div style="background:#5B8A9A;padding:28px 32px;text-align:center">
+      <h1 style="color:#F2E8D5;font-size:22px;letter-spacing:3px;margin:0">DOMINUS TECUM</h1>
+      <p style="color:rgba(255,255,255,0.65);font-size:13px;margin:6px 0 0;font-style:italic">
+        Holy Rosary Cathedral Hall &middot; Vancouver
+      </p>
+    </div>"""
+
+
+def _email_footer():
+    """Warm tan footer with copyright line used at the bottom of every member email."""
+    return """
+    <div style="background:#EDE3CF;padding:14px;text-align:center">
+      <p style="margin:0;font-size:10px;letter-spacing:2px;color:#A08B72">
+        &copy; DOMINUS TECUM &middot; HOLY ROSARY CATHEDRAL &middot; VANCOUVER
+      </p>
+    </div>"""
+
+
+def _language_divider():
+    """
+    A subtle horizontal rule that separates the Spanish and English sections.
+    Uses a slightly darker cream tone so it's visible but not harsh.
+    """
+    return """
+    <div style="padding:0 32px;background:#FAF5EC">
+      <hr style="border:none;border-top:2px solid #EDE3CF;margin:0"/>
+    </div>"""
+
+
+def _location_box():
+    """
+    A steel-blue info box showing the meeting location and schedule.
+    Used in both the confirmation and reminder emails.
+    The left burgundy border gives it visual weight without being loud.
+    """
+    return """
+    <div style="padding:16px;background:#EBF4F7;border-left:3px solid #7A1528;
+                border-radius:4px;margin-bottom:16px">
+      <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
+        &#128205; Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC<br>
+        &#128197; Mie&eacute;rcoles / Wednesdays &middot; 7:00 &ndash; 9:00 PM
+      </p>
+    </div>"""
+
+
+def _contact_line():
+    """
+    A small contact line linking to the group Gmail.
+    Shown at the bottom of each language section so both Spanish and
+    English readers know how to reach us.
+    """
+    return f"""
+    <p style="color:#7A6555;font-size:13px;margin:0">
+      &iquest;Preguntas? / Questions?
+      <a href="mailto:{GMAIL_ADDRESS}" style="color:#5B8A9A">{GMAIL_ADDRESS}</a>
+    </p>"""
+
+
+# ── Member-facing emails ───────────────────────────────────────────────────────
+
 def send_rsvp_confirmation(name: str, email: str, event_title: str) -> bool:
     """
     Sends a branded confirmation email to the person who just RSVPed.
 
-    This is the email the attendee receives — it confirms their spot,
-    shows the event name, and includes the cathedral address.
-    Both Spanish and English are included since the group is bilingual.
+    Layout:
+      - Header (branded)
+      - ESPAÑOL section — greeting, confirmation message, location box, contact
+      - Visual divider
+      - ENGLISH section — same content in English
+      - Footer (branded)
 
     Uses an f-string for the HTML body, which lets us embed Python
     variables directly inside the string using {curly braces}.
     """
-    subject = f'¡Te esperamos, {name}! / See you there!'
+    subject = f'Confirmacion de asistencia / RSVP Confirmed - {event_title}'
 
     # The HTML email template — inline styles are used because
     # many email clients strip out <style> tags and external CSS.
     html = f"""
     <div style="font-family:'Georgia',serif;max-width:520px;margin:0 auto;color:#2A1810">
+      {_email_header()}
 
-      <!-- Header banner with brand colors -->
-      <div style="background:#5B8A9A;padding:28px 32px;text-align:center">
-        <h1 style="color:#F2E8D5;font-size:22px;letter-spacing:3px;margin:0">
-          DOMINUS TECUM
-        </h1>
-        <p style="color:rgba(255,255,255,0.65);font-size:13px;margin:6px 0 0;font-style:italic">
-          Holy Rosary Cathedral · Vancouver
+      <!-- ── ESPAÑOL ── -->
+      <div style="padding:32px 32px 24px;background:#FAF5EC">
+        <!-- Small language label so the reader knows which section they're in -->
+        <p style="font-size:9px;font-weight:bold;letter-spacing:3px;color:#5B8A9A;margin:0 0 16px">ESPA&Ntilde;OL</p>
+        <p style="font-size:18px;margin:0 0 12px">Hola {name},</p>
+        <p style="color:#5C3D2E;line-height:1.8;margin:0 0 20px">
+          &iexcl;Confirmamos tu asistencia a <strong>{event_title}</strong>!
+          Te esperamos con mucho gusto.
         </p>
+        {_location_box()}
+        {_contact_line()}
       </div>
 
-      <!-- Email body -->
-      <div style="padding:32px;background:#FAF5EC">
-        <!-- {name} is replaced with the actual person's name at send time -->
-        <p style="font-size:18px;margin:0 0 12px">Hola {name} / Hi {name},</p>
-        <p style="color:#5C3D2E;line-height:1.8">
-          ¡Confirmamos tu asistencia a <strong>{event_title}</strong>!
-          Te esperamos con mucho gusto.<br><br>
-          We've confirmed your RSVP for <strong>{event_title}</strong>.
-          We look forward to seeing you!
-        </p>
+      {_language_divider()}
 
-        <!-- Location box -->
-        <div style="margin:24px 0;padding:16px;background:#EBF4F7;
-                    border-left:3px solid #7A1528;border-radius:4px">
-          <p style="margin:0;font-size:13px;color:#2A5A6A">
-            📍 Holy Rosary Cathedral<br>
-            650 Richards St, Vancouver BC
-          </p>
-        </div>
-
-        <!-- Contact info -->
-        <p style="color:#7A6555;font-size:13px">
-          ¿Preguntas? / Questions?<br>
-          <a href="mailto:{GMAIL_ADDRESS}" style="color:#5B8A9A">{GMAIL_ADDRESS}</a>
+      <!-- ── ENGLISH ── -->
+      <div style="padding:24px 32px 32px;background:#FAF5EC">
+        <p style="font-size:9px;font-weight:bold;letter-spacing:3px;color:#5B8A9A;margin:0 0 16px">ENGLISH</p>
+        <p style="font-size:18px;margin:0 0 12px">Hi {name},</p>
+        <p style="color:#5C3D2E;line-height:1.8;margin:0 0 20px">
+          We&apos;ve confirmed your RSVP for <strong>{event_title}</strong>!
+          We look forward to seeing you.
         </p>
+        {_location_box()}
+        {_contact_line()}
       </div>
 
-      <!-- Footer -->
-      <div style="background:#EDE3CF;padding:14px;text-align:center">
-        <p style="margin:0;font-size:10px;letter-spacing:2px;color:#A08B72">
-          © DOMINUS TECUM · HOLY ROSARY CATHEDRAL · VANCOUVER
-        </p>
-      </div>
-
+      {_email_footer()}
     </div>
     """
     # send_email() handles the actual API call and returns True/False
@@ -205,14 +271,17 @@ def send_rsvp_notification(name: str, email: str,
     someone RSVPs, so leaders know who's coming without checking
     the admin dashboard.
 
+    This is a leaders-only internal email so it stays compact —
+    bilingual labels inline rather than full separate sections.
+
     If the person is attending for the first time, a star emoji
     is added so it stands out — helps leaders make sure newcomers
     feel especially welcomed.
     """
     # Build the "first time" flag string — empty if they're a regular
-    first_tag = ' 🌟 <strong>Primera vez / First time!</strong>' if first_time else ''
+    first_tag = ' <strong>&#11088; Primera vez / First time!</strong>' if first_time else ''
 
-    subject = f'Nueva RSVP: {name} — {event_title}'
+    subject = f'Nueva RSVP: {name} - {event_title}'
 
     # Simple table layout — easy to scan in the Gmail inbox
     html = f"""
@@ -233,70 +302,97 @@ def send_rsvp_notification(name: str, email: str,
         </tr>
       </table>
       <p style="color:#888;font-size:12px;margin-top:16px">
-        Ver todas las RSVPs en el panel de administración.
+        Ver todas las RSVPs en el panel de administraci&oacute;n.
       </p>
     </div>
     """
     # Send TO the group Gmail — leaders will see this in their inbox
     return send_email(GMAIL_ADDRESS, subject, html)
 
+
 def send_event_reminder(name: str, email: str, event_title: str,
                         event_date: str, event_time: str,
                         reminder_type: str) -> bool:
     """
     Sends a bilingual reminder email to someone who RSVPed for an upcoming event.
-    Called by the cron job — once the evening before (day_before)
-    and once the morning of the event (morning_of).
+
+    Called automatically by the cron job in routes.py:
+      - Once the evening before at 6:00 PM (reminder_type='day_before')
+      - Once the morning of at 9:00 AM  (reminder_type='morning_of')
+
+    Layout matches send_rsvp_confirmation — Spanish first, divider, English.
+
+    Parameters:
+      name          — attendee's name (e.g. "Alberto")
+      email         — attendee's email address
+      event_title   — Spanish title of the event
+      event_date    — formatted date string e.g. "miércoles 15 de abril"
+      event_time    — time string e.g. "7:00 PM"
+      reminder_type — "day_before" or "morning_of" — controls the subject
+                      line and opening message so each email feels distinct
     """
+    # Choose subject line and opening messages based on timing.
+    # "day_before" gets an anticipatory tone, "morning_of" gets excitement.
     if reminder_type == 'day_before':
-        subject = f'¡Nos vemos mañana, {name}! / See you tomorrow!'
-        timing_es = '¡Nos vemos <strong>mañana</strong>!'
-        timing_en = 'See you <strong>tomorrow</strong>!'
-        sub_es = 'Recuerda que tienes un lugar reservado para este evento.'
-        sub_en = 'Just a reminder that you have a spot reserved for this event.'
+        subject    = f'Nos vemos manana / See you tomorrow - {event_title}'
+        heading_es = '&iexcl;Nos vemos <strong>ma&ntilde;ana</strong>!'
+        body_es    = 'Recuerda que tienes un lugar reservado para este evento.'
+        heading_en = 'See you <strong>tomorrow</strong>!'
+        body_en    = 'Just a reminder that you have a spot reserved for this event.'
     else:
-        subject = f'¡Hoy es el día, {name}! / Today is the day!'
-        timing_es = '¡<strong>Hoy</strong> es el día!'
-        timing_en = '<strong>Today</strong> is the day!'
-        sub_es = 'Te esperamos esta noche con mucho gusto.'
-        sub_en = 'We look forward to seeing you tonight!'
+        subject    = f'Hoy es el dia / Today is the day - {event_title}'
+        heading_es = '&iexcl;<strong>Hoy</strong> es el d&iacute;a!'
+        body_es    = 'Te esperamos esta noche con mucho gusto.'
+        heading_en = '<strong>Today</strong> is the day!'
+        body_en    = 'We look forward to seeing you tonight!'
+
+    # Event-specific details box — shows title, date, time, location.
+    # This is different from _location_box() because it includes the
+    # specific event name, date and time rather than the generic schedule.
+    event_box = f"""
+    <div style="padding:16px;background:#EBF4F7;border-left:3px solid #7A1528;
+                border-radius:4px;margin-bottom:16px">
+      <p style="margin:0 0 6px;font-size:15px;font-weight:bold;color:#2A1810">{event_title}</p>
+      <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
+        &#128197; {event_date} &middot; {event_time}<br>
+        &#128205; Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC
+      </p>
+    </div>"""
 
     html = f"""
     <div style="font-family:'Georgia',serif;max-width:520px;margin:0 auto;color:#2A1810">
-      <div style="background:#5B8A9A;padding:28px 32px;text-align:center">
-        <h1 style="color:#F2E8D5;font-size:22px;letter-spacing:3px;margin:0">DOMINUS TECUM</h1>
-        <p style="color:rgba(255,255,255,0.65);font-size:13px;margin:6px 0 0;font-style:italic">
-          Holy Rosary Cathedral Hall · Vancouver
-        </p>
-      </div>
-      <div style="padding:32px;background:#FAF5EC">
-        <p style="font-size:18px;margin:0 0 8px">Hola {name} / Hi {name},</p>
-        <p style="font-size:20px;font-weight:bold;color:#7A1528;margin:0 0 4px">{timing_es}</p>
-        <p style="font-size:20px;font-weight:bold;color:#5B8A9A;margin:0 0 16px">{timing_en}</p>
-        <p style="color:#5C3D2E;line-height:1.8;margin:0 0 20px">
-          {sub_es}<br>{sub_en}
-        </p>
-        <div style="background:#EBF4F7;border-left:4px solid #7A1528;
-                    border-radius:4px;padding:18px 20px;margin-bottom:20px">
-          <p style="margin:0 0 8px;font-size:16px;font-weight:bold;color:#2A1810">
-            {event_title}
-          </p>
-          <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
-            📅 {event_date}<br>
-            🕖 {event_time}<br>
-            📍 Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC
-          </p>
-        </div>
-        <p style="color:#7A6555;font-size:13px">
-          ¿Preguntas? / Questions?<br>
+      {_email_header()}
+
+      <!-- ── ESPAÑOL ── -->
+      <div style="padding:32px 32px 24px;background:#FAF5EC">
+        <p style="font-size:9px;font-weight:bold;letter-spacing:3px;color:#5B8A9A;margin:0 0 16px">ESPA&Ntilde;OL</p>
+        <p style="font-size:18px;margin:0 0 8px">Hola {name},</p>
+        <!-- Large heading gives the email immediate visual impact -->
+        <p style="font-size:20px;font-weight:bold;color:#7A1528;margin:0 0 8px">{heading_es}</p>
+        <p style="color:#5C3D2E;line-height:1.8;margin:0 0 16px">{body_es}</p>
+        {event_box}
+        <p style="color:#5C3D2E;font-size:13px;margin:0">
+          Si no puedes asistir, cont&aacute;ctanos:
           <a href="mailto:{GMAIL_ADDRESS}" style="color:#5B8A9A">{GMAIL_ADDRESS}</a>
         </p>
       </div>
-      <div style="background:#EDE3CF;padding:14px;text-align:center">
-        <p style="margin:0;font-size:10px;letter-spacing:2px;color:#A08B72">
-          © DOMINUS TECUM · HOLY ROSARY CATHEDRAL · VANCOUVER
+
+      {_language_divider()}
+
+      <!-- ── ENGLISH ── -->
+      <div style="padding:24px 32px 32px;background:#FAF5EC">
+        <p style="font-size:9px;font-weight:bold;letter-spacing:3px;color:#5B8A9A;margin:0 0 16px">ENGLISH</p>
+        <p style="font-size:18px;margin:0 0 8px">Hi {name},</p>
+        <p style="font-size:20px;font-weight:bold;color:#7A1528;margin:0 0 8px">{heading_en}</p>
+        <p style="color:#5C3D2E;line-height:1.8;margin:0 0 16px">{body_en}</p>
+        {event_box}
+        <p style="color:#5C3D2E;font-size:13px;margin:0">
+          Can&apos;t make it? Let us know:
+          <a href="mailto:{GMAIL_ADDRESS}" style="color:#5B8A9A">{GMAIL_ADDRESS}</a>
         </p>
       </div>
+
+      {_email_footer()}
     </div>
     """
     return send_email(email, subject, html)
