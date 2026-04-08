@@ -290,8 +290,8 @@ function showSuccess(name, lang) {
   const msg = document.getElementById('success-msg');
   const text = document.getElementById('success-text');
   text.textContent = lang === 'es'
-    ? `¡Gracias, ${name}! Te esperamos este viernes. 🙏`
-    : `Thanks, ${name}! We'll see you this Friday. 🙏`;
+    ? `¡Gracias, ${name}! Te esperamos pronto. 🙏`
+    : `Thanks, ${name}! We'll see you soon. 🙏`;
   msg.style.display = 'flex';
   setTimeout(() => msg.style.display = 'none', 5000);
 }
