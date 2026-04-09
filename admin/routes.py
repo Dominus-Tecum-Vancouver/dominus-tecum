@@ -256,7 +256,8 @@ def admin_dashboard():
 
     # render_template() finds the file in the templates/ folder,
     # fills in the variables we pass, and returns the resulting HTML.
-    return render_template('admin/dashboard.html', events=events, rsvps=rsvps)
+    from datetime import date
+    return render_template('admin/dashboard.html', events=events, rsvps=rsvps, today=date.today())
 
 
 @bp.route('/admin/events/new', methods=['GET', 'POST'])
