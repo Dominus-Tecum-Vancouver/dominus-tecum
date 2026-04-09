@@ -106,8 +106,8 @@ def api_events():
     # Query the database for active events, sorted by date (soonest first)
     from datetime import date
     events = Event.query.filter(
-    Event.active == True,
-    Event.date >= date.today()
+        Event.active == True,
+        Event.date >= date.today()
     ).order_by(Event.date.asc()).all()
 
     # Convert each Event object to a dict, then return as JSON
