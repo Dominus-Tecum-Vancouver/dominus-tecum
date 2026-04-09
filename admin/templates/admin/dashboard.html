@@ -49,11 +49,12 @@
         <td><span class="badge badge-{{ event.tag }}">{{ event.tag.upper() }}</span></td>
         <td>{{ event.rsvps|length }}</td>
         <td>
-          {% if event.active %}
-          <span style="color:#1B5E20;font-size:11px">● Activo</span>
-          {% else %}
-          <span style="color:#999;font-size:11px">○ Inactivo</span>
-          {% endif %}
+          {% if event.date < today %} <span style="color:#999;font-size:11px">○ Pasado</span>
+            {% elif event.active %}
+            <span style="color:#1B5E20;font-size:11px">● Activo</span>
+            {% else %}
+            <span style="color:#999;font-size:11px">○ Inactivo</span>
+            {% endif %}
         </td>
         <td style="white-space:nowrap">
           <a href="/admin/events/{{ event.id }}/edit" class="btn btn-outline btn-sm">Editar</a>
