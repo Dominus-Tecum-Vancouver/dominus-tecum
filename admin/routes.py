@@ -104,7 +104,11 @@ def api_events():
     lang = request.args.get('lang', 'es')
 
     # Query the database for active events, sorted by date (soonest first)
-    events = Event.query.filter_by(active=True).order_by(Event.date).all()
+    from datetime import date
+    events = Event.query.filter(
+    Event.active == True,
+    Event.date >= date.today()
+    ).order_by(Event.date.asc()).all()
 
     # Convert each Event object to a dict, then return as JSON
     # jsonify() automatically sets the Content-Type header to application/json
