@@ -320,7 +320,7 @@ def admin_event_edit(event_id):
         event.tag      = f['tag']
         # The 'active' checkbox is only in the form data when it's checked.
         # 'active' in f checks whether the key exists in the form submission.
-        event.active   = 'active' in f
+        event.active = f.get('active') == 'active'
         # No need to db.session.add() — SQLAlchemy already tracks this object.
         # Just commit to save the changes.
         db.session.commit()
