@@ -31,7 +31,7 @@ from werkzeug.security import check_password_hash  # Verifies hashed passwords
 
 from . import db
 from .gmail_service import send_rsvp_confirmation, send_rsvp_notification
-from .models import Event, RSVP
+from .models import Event, RSVP, Resource
 from .sheets_service import log_rsvp
 
 # Create the Blueprint — 'main' is its name, used internally by Flask
@@ -378,6 +378,96 @@ def admin_rsvps():
         events=events,
         selected_event=event_id,  # So the template can highlight the active filter
     )
+
+# ── Resource Routes ────────────────────────────────────────────────────────────
+
+@bp.route('/api/recursos')
+def api_recursos():
+    """
+    GET /api/recursos?lang=es
+
+    Public API endpoint — returns all active resources as JSON.
+    Called by the frontend recursos.html page to load resources dynamically.
+    Accepts an optional ?lang= query parameter (defaults to 'es').
+    """
+    lang      = request.args.get('lang', 'es')
+    recursos  = Resource.query.filter_by(active=True).order_by(Resource.category).all()
+    return jsonify([r.to_dict(lang) for r in recursos])
+
+
+@bp.route('/admin/recursos')
+@admin_required
+def admin_recursos():
+    """
+    GET /admin/recursos
+
+    Admin list of all resources — shows both active and inactive.
+    Leaders can see everything and manage visibility from here.
+    """
+    recursos = Resource.query.order_by(Resource.category, Resource.id).all()
+    return render_template('admin/recursos.html', recursos=recursos)
+
+
+@bp.route('/admin/recursos/new', methods=['GET', 'POST'])
+@admin_required
+def admin_recurso_new():
+    """
+    GET  /admin/recursos/new — Show the create resource form
+    POST /admin/recursos/new — Process the form and save the new resource
+    """
+    if request.method == 'POST':
+        f = request.form
+        recurso = Resource(
+            title_es = f['title_es'],
+            title_en = f['title_en'],
+            desc_es  = f['desc_es'],
+            desc_en  = f['desc_en'],
+            category = f['category'],
+            # URL is optional — use None if left blank
+            url      = f.get('url') or None,
+            active   = True,
+        )
+        db.session.add(recurso)
+        db.session.commit()
+        return redirect(url_for('main.admin_recursos'))
+    return render_template('admin/recurso_form.html', recurso=None)
+
+
+@bp.route('/admin/recursos/<int:recurso_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_recurso_edit(recurso_id):
+    """
+    GET  /admin/recursos/<id>/edit — Show the edit form pre-filled with current values
+    POST /admin/recursos/<id>/edit — Save the updated resource
+    """
+    recurso = Resource.query.get_or_404(recurso_id)
+    if request.method == 'POST':
+        f = request.form
+        recurso.title_es = f['title_es']
+        recurso.title_en = f['title_en']
+        recurso.desc_es  = f['desc_es']
+        recurso.desc_en  = f['desc_en']
+        recurso.category = f['category']
+        recurso.url      = f.get('url') or None
+        recurso.active   = f.get('active') == 'active'
+        db.session.commit()
+        return redirect(url_for('main.admin_recursos'))
+    return render_template('admin/recurso_form.html', recurso=recurso)
+
+
+@bp.route('/admin/recursos/<int:recurso_id>/delete', methods=['POST'])
+@admin_required
+def admin_recurso_delete(recurso_id):
+    """
+    POST /admin/recursos/<id>/delete
+
+    Deletes a resource permanently. No cascade needed since resources
+    have no related models.
+    """
+    recurso = Resource.query.get_or_404(recurso_id)
+    db.session.delete(recurso)
+    db.session.commit()
+    return redirect(url_for('main.admin_recursos'))
 
 # ── Cron / Reminder Routes ─────────────────────────────────────────────────────
 
