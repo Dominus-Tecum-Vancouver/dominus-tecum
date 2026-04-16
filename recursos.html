@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recursos — Dominus Tecum</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --cream: #F2E8D5;
+            --parchment: #FAF5EC;
+            --parchment-dark: #EDE3CF;
+            --tan: #A08B72;
+            --tan-light: #C4AA8A;
+            --steel: #5B8A9A;
+            --steel-light: #7AAABB;
+            --steel-pale: #D6E8EE;
+            --steel-bg: #EBF4F7;
+            --burgundy: #7A1528;
+            --burgundy-light: #9A2A3A;
+            --dark: #2A1810;
+            --muted: #6A7E85;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--parchment);
+            color: var(--dark);
+            min-height: 100vh
+        }
+
+        /* ── NAV ── */
+        nav {
+            background: var(--steel);
+            padding: 0 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none
+        }
+
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid rgba(255, 255, 255, 0.3)
+        }
+
+        .nav-title {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: .2em;
+            color: var(--cream);
+            font-weight: 600
+        }
+
+        .nav-sub {
+            font-size: 9px;
+            letter-spacing: .15em;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none
+        }
+
+        .nav-links a {
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            letter-spacing: .18em;
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            transition: color .2s
+        }
+
+        .nav-links a:hover {
+            color: white
+        }
+
+        .lang-btn {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.75);
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            letter-spacing: .15em;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white
+        }
+
+        /* ── HERO ── */
+        .page-hero {
+            background: var(--steel);
+            padding: 64px 48px 56px;
+            text-align: center
+        }
+
+        .page-hero .label {
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            letter-spacing: .25em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 16px
+        }
+
+        .page-hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--cream);
+            letter-spacing: .05em;
+            margin-bottom: 12px
+        }
+
+        .page-hero p {
+            font-family: 'Crimson Text', serif;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic
+        }
+
+        /* ── CONTENT ── */
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 56px 24px
+        }
+
+        /* ── CATEGORY SECTION ── */
+        .category-section {
+            margin-bottom: 48px
+        }
+
+        .category-label {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: .25em;
+            color: var(--steel);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--steel-pale);
+            text-transform: uppercase
+        }
+
+        /* ── RESOURCE CARD ── */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px
+        }
+
+        .resource-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            border: 1px solid var(--parchment-dark);
+            transition: all .2s;
+            text-decoration: none;
+            display: block;
+            color: var(--dark)
+        }
+
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(42, 24, 16, .08);
+            border-color: var(--steel-pale)
+        }
+
+        .resource-card.has-url {
+            cursor: pointer
+        }
+
+        .resource-card .r-title {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: .08em;
+            color: var(--dark);
+            margin-bottom: 8px;
+            line-height: 1.4
+        }
+
+        .resource-card .r-desc {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 16px
+        }
+
+        .resource-card .r-link {
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            letter-spacing: .15em;
+            color: var(--steel);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .resource-card .r-link svg {
+            transition: transform .2s
+        }
+
+        .resource-card:hover .r-link svg {
+            transform: translateX(3px)
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty {
+            text-align: center;
+            padding: 80px 24px;
+            color: var(--muted)
+        }
+
+        .empty p {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: .15em
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--parchment-dark);
+            padding: 40px 48px 24px;
+            margin-top: 80px
+        }
+
+        .footer-copy {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            letter-spacing: .2em;
+            color: var(--tan);
+            padding-top: 24px;
+            border-top: 1px solid var(--tan-light)
+        }
+
+        @media(max-width:768px) {
+            nav {
+                padding: 0 20px
+            }
+
+            .nav-links {
+                display: none
+            }
+
+            .page-hero {
+                padding: 48px 24px 40px
+            }
+
+            .page-hero h1 {
+                font-size: 26px
+            }
+
+            .content {
+                padding: 40px 16px
+            }
+
+            footer {
+                padding: 32px 24px 20px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a class="nav-brand" href="index.html">
+            <img src="data:image/jpeg;base64,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"
+                alt="Dominus Tecum" class="nav-logo" />
+            <div>
+                <div class="nav-title">DOMINUS TECUM</div>
+                <div class="nav-sub">Holy Rosary Cathedral · Vancouver</div>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html" data-es="INICIO" data-en="HOME">INICIO</a></li>
+            <li><a href="index.html#events" data-es="EVENTOS" data-en="EVENTS">EVENTOS</a></li>
+            <li><a href="recursos.html" data-es="RECURSOS" data-en="RESOURCES" style="color:white">RECURSOS</a></li>
+        </ul>
+        <div style="display:flex;gap:8px">
+            <button class="lang-btn active" onclick="setLang('es')" id="btn-es">ES</button>
+            <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
+        </div>
+    </nav>
+
+    <div class="page-hero">
+        <p class="label" data-es="PARA EL GRUPO" data-en="FOR THE GROUP">PARA EL GRUPO</p>
+        <h1 data-es="Recursos" data-en="Resources">Recursos</h1>
+        <p data-es="Materiales de fe para tu camino espiritual." data-en="Faith materials for your spiritual journey.">
+            Materiales de fe para tu camino espiritual.</p>
+    </div>
+
+    <div class="content">
+        <div id="recursos-container">
+            <div class="empty">
+                <p data-es="CARGANDO..." data-en="LOADING...">CARGANDO...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-copy">© 2026 DOMINUS TECUM · HOLY ROSARY CATHEDRAL · VANCOUVER</div>
+    </footer>
+
+    <script>
+        const API_BASE = 'https://dominus-tecum.onrender.com';
+        let currentLang = 'es';
+
+        const CATEGORY_LABELS = {
+            es: { oracion: 'ORACIÓN', lecturas: 'LECTURAS', videos: 'VIDEOS', otro: 'OTROS RECURSOS' },
+            en: { oracion: 'PRAYER', lecturas: 'READINGS', videos: 'VIDEOS', otro: 'OTHER RESOURCES' }
+        };
+
+        const LINK_LABELS = {
+            es: 'VER RECURSO',
+            en: 'VIEW RESOURCE'
+        };
+
+        async function loadRecursos(lang) {
+            const container = document.getElementById('recursos-container');
+            try {
+                const res = await fetch(`${API_BASE}/api/recursos?lang=${lang}`);
+                const data = await res.json();
+
+                if (!data.length) {
+                    container.innerHTML = `<div class="empty"><p>${lang === 'es' ? 'AÚN NO HAY RECURSOS DISPONIBLES.' : 'NO RESOURCES AVAILABLE YET.'}</p></div>`;
+                    return;
+                }
+
+                // Group by category
+                const grouped = {};
+                data.forEach(r => {
+                    if (!grouped[r.category]) grouped[r.category] = [];
+                    grouped[r.category].push(r);
+                });
+
+                const categoryOrder = ['oracion', 'lecturas', 'videos', 'otro'];
+                let html = '';
+
+                categoryOrder.forEach(cat => {
+                    if (!grouped[cat]) return;
+                    const label = CATEGORY_LABELS[lang][cat] || cat.toUpperCase();
+                    html += `<div class="category-section">
+        <div class="category-label">${label}</div>
+        <div class="resource-grid">`;
+
+                    grouped[cat].forEach(r => {
+                        const isLink = r.url && r.url.trim() !== '';
+                        const tag = isLink ? 'a' : 'div';
+                        const href = isLink ? `href="${r.url}" target="_blank" rel="noopener"` : '';
+                        html += `<${tag} class="resource-card${isLink ? ' has-url' : ''}" ${href}>
+          <div class="r-title">${r.title}</div>
+          <div class="r-desc">${r.desc}</div>
+          ${isLink ? `<div class="r-link">${LINK_LABELS[lang]} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>` : ''}
+        </${tag}>`;
+                    });
+
+                    html += '</div></div>';
+                });
+
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = '<div class="empty"><p>Error cargando recursos.</p></div>';
+            }
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-es]').forEach(el => {
+                el.textContent = lang === 'es' ? el.dataset.es : el.dataset.en;
+            });
+            document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.documentElement.lang = lang;
+            loadRecursos(lang);
+        }
+
+        loadRecursos('es');
+    </script>
+</body>
+
+</html>
