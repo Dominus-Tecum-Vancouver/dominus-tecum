@@ -151,3 +151,40 @@ class RSVP(db.Model):
             # Format the timestamp as a readable string for display
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M'),
         }
+
+class Resource(db.Model):
+    """
+    Represents a resource (prayer guide, reading, video link, etc.)
+    that leaders can share with the group through the admin panel.
+
+    Resources are bilingual — each has a Spanish and English title
+    and description. The URL field links to external content.
+    Category helps organize resources into groups on the public page.
+    """
+    __tablename__ = 'resources'
+
+    id             = db.Column(db.Integer, primary_key=True)
+    title_es       = db.Column(db.String(200), nullable=False)
+    title_en       = db.Column(db.String(200), nullable=False)
+    desc_es        = db.Column(db.Text, nullable=False)
+    desc_en        = db.Column(db.Text, nullable=False)
+    # Category groups resources e.g. 'oracion', 'lecturas', 'videos', 'otro'
+    category       = db.Column(db.String(50), nullable=False, default='otro')
+    # Optional URL linking to external content (YouTube, PDF, website, etc.)
+    url            = db.Column(db.String(500), nullable=True)
+    # Whether this resource is visible on the public page
+    active         = db.Column(db.Boolean, nullable=False, default=True)
+    created_at     = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self, lang='es'):
+        """
+        Returns a dictionary representation of the resource for the API.
+        Uses Spanish or English fields based on the lang parameter.
+        """
+        return {
+            'id':       self.id,
+            'title':    self.title_es if lang == 'es' else self.title_en,
+            'desc':     self.desc_es  if lang == 'es' else self.desc_en,
+            'category': self.category,
+            'url':      self.url,
+        }
