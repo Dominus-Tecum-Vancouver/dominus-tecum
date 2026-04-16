@@ -1,0 +1,62 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+
+<div class="page-title">Recursos</div>
+<div class="page-sub">Gestiona los recursos compartidos con el grupo.</div>
+
+<div style="display:flex;justify-content:flex-end;margin-bottom:20px">
+    <a href="/admin/recursos/new" class="btn btn-primary">+ Nuevo Recurso</a>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Título (ES)</th>
+                <th>Categoría</th>
+                <th>URL</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in recursos %}
+            <tr>
+                <td style="font-weight:500">{{ r.title_es }}</td>
+                <td>
+                    <span class="badge badge-{{ r.category }}">{{ r.category.upper() }}</span>
+                </td>
+                <td style="font-size:12px;color:#5B8A9A">
+                    {% if r.url %}
+                    <a href="{{ r.url }}" target="_blank" style="color:#5B8A9A">Ver enlace</a>
+                    {% else %}
+                    <span style="color:#ccc">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.active %}
+                    <span style="color:#1B5E20;font-size:11px">● Activo</span>
+                    {% else %}
+                    <span style="color:#999;font-size:11px">○ Inactivo</span>
+                    {% endif %}
+                </td>
+                <td style="white-space:nowrap">
+                    <a href="/admin/recursos/{{ r.id }}/edit" class="btn btn-outline btn-sm">Editar</a>
+                    <form method="POST" action="/admin/recursos/{{ r.id }}/delete" style="display:inline"
+                        onsubmit="return confirm('¿Eliminar este recurso?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align:center;color:#999;padding:32px">
+                    No hay recursos. <a href="/admin/recursos/new" style="color:#5B8A9A">Agrega el primero.</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

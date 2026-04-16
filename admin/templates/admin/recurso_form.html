@@ -1,0 +1,77 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+
+<div class="page-title">{{ 'Editar recurso' if recurso else 'Nuevo recurso' }}</div>
+<div class="page-sub">{{ 'Modifica los detalles del recurso.' if recurso else 'Completa los campos en español e inglés.'
+    }}</div>
+
+<div class="card" style="max-width:700px">
+    <form method="POST">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>TÍTULO (ESPAÑOL)</label>
+                <input type="text" name="title_es" value="{{ recurso.title_es if recurso }}" required
+                    placeholder="Cómo rezar el Rosario" />
+            </div>
+            <div class="form-group">
+                <label>TITLE (ENGLISH)</label>
+                <input type="text" name="title_en" value="{{ recurso.title_en if recurso }}" required
+                    placeholder="How to pray the Rosary" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>DESCRIPCIÓN (ESPAÑOL)</label>
+            <textarea name="desc_es" rows="3" required
+                placeholder="Una guía paso a paso para rezar el Santo Rosario...">{{ recurso.desc_es if recurso }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>DESCRIPTION (ENGLISH)</label>
+            <textarea name="desc_en" rows="3" required
+                placeholder="A step by step guide to praying the Holy Rosary...">{{ recurso.desc_en if recurso }}</textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>CATEGORÍA</label>
+                <select name="category" required>
+                    <option value="oracion" {{ 'selected' if recurso and recurso.category=='oracion' }}>Oración</option>
+                    <option value="lecturas" {{ 'selected' if recurso and recurso.category=='lecturas' }}>Lecturas
+                    </option>
+                    <option value="videos" {{ 'selected' if recurso and recurso.category=='videos' }}>Videos</option>
+                    <option value="otro" {{ 'selected' if recurso and recurso.category=='otro' }}>Otro</option>
+                </select>
+            </div>
+            {% if recurso %}
+            <div class="form-group">
+                <label>ESTADO</label>
+                <select name="active">
+                    <option value="active" {{ 'selected' if recurso.active }}>Activo</option>
+                    <option value="" {{ 'selected' if not recurso.active }}>Inactivo</option>
+                </select>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>URL (OPCIONAL)</label>
+            <input type="url" name="url" value="{{ recurso.url if recurso and recurso.url }}"
+                placeholder="https://www.vatican.va/special/rosary/" />
+            <small style="color:#999;font-size:11px">
+                Enlace a un sitio web, video de YouTube, PDF, etc. Dejar en blanco si no aplica.
+            </small>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:8px">
+            <button type="submit" class="btn btn-primary">
+                {{ 'Guardar cambios' if recurso else 'Crear recurso' }}
+            </button>
+            <a href="/admin/recursos" class="btn btn-outline">Cancelar</a>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
