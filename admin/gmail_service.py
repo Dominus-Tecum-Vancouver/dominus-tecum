@@ -188,7 +188,7 @@ def _location_box():
                 border-radius:4px;margin-bottom:16px">
       <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
         &#128205; Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC<br>
-        &#128197; Mie&eacute;rcoles / Wednesdays &middot; 7:00 &ndash; 9:00 PM
+        &#128197; Miércoles / Wednesdays &middot; 7:00 &ndash; 9:00 PM
       </p>
     </div>"""
 
