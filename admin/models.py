@@ -107,50 +107,31 @@ class Event(db.Model):
 
 class RSVP(db.Model):
     """
-    Represents one person's RSVP for one event.
+    Represents a single RSVP submitted through the public site.
 
-    Each row is one confirmation. If the same person RSVPs to three
-    events, there will be three rows with their name and email.
+    Split into first_name and last_name so leaders can identify
+    members more easily — full name is reconstructed as needed
+    by combining both fields.
     """
-
     __tablename__ = 'rsvps'
 
-    # Auto-incrementing unique ID for each RSVP
-    id = db.Column(db.Integer, primary_key=True)
-
-    # The person's name — required
-    name = db.Column(db.String(120), nullable=False)
-
-    # Their email — required (used to send confirmation)
-    email = db.Column(db.String(120), nullable=False)
-
-    # Foreign key — links this RSVP to an event.
-    # db.ForeignKey('events.id') means this must match an id in the events table.
-    # nullable=False means every RSVP must belong to an event.
-    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
-
-    # Whether this is their first time attending any group event.
-    # Useful for leaders to give extra attention to newcomers.
-    # Defaults to False (not a first-timer).
+    id         = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name  = db.Column(db.String(100), nullable=False)
+    email      = db.Column(db.String(200), nullable=False)
+    event_id   = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     first_time = db.Column(db.Boolean, default=False)
-
-    # Automatically records when the RSVP was submitted.
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def to_dict(self):
+    @property
+    def name(self):
         """
-        Converts this RSVP to a dictionary for JSON responses
-        or the admin dashboard display.
+        Reconstructs the full name from first and last name.
+        Used everywhere the old 'name' field was used so we don't
+        have to update every single template reference.
         """
-        return {
-            'id':         self.id,
-            'name':       self.name,
-            'email':      self.email,
-            'event_id':   self.event_id,
-            'first_time': self.first_time,
-            # Format the timestamp as a readable string for display
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M'),
-        }
+        return f'{self.first_name} {self.last_name}'
+
 
 class Resource(db.Model):
     """
