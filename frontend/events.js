@@ -209,8 +209,10 @@ function closeModal() {
  */
 async function submitRSVP() {
   // Read the current values from the form inputs by their HTML id
-  const name = document.getElementById('rsvp-name').value.trim();
+  const firstName = document.getElementById('rsvp-first-name').value.trim();
+  const lastName = document.getElementById('rsvp-last-name').value.trim();
   const email = document.getElementById('rsvp-email').value.trim();
+
   // Check if the selected option text contains 'primera' (Spanish) or 'first' (English)
   // to determine if this person is attending for the first time
   const firstTime = document.getElementById('rsvp-first').value.includes('primera') ||
@@ -220,11 +222,11 @@ async function submitRSVP() {
   // It tells us which language the user is currently viewing
   const lang = window.__lang || 'es';
 
-  // Client-side validation — check name before sending to the server
-  if (!name) {
+  // Client-side validation — check both name fields before sending to the server
+  if (!firstName || !lastName) {
     alert(lang === 'es'
-      ? 'Por favor ingresa tu nombre.'
-      : 'Please enter your name.');
+      ? 'Por favor ingresa tu nombre y apellido.'
+      : 'Please enter your first and last name.');
     return; // Stop here — don't submit the form
   }
 
@@ -235,8 +237,7 @@ async function submitRSVP() {
      * headers tells the server we're sending JSON data.
      *
      * JSON.stringify() converts our JavaScript object into a JSON string:
-     *   { name: "Alberto", email: "...', event_id: 1, first_time: false }
-     *   becomes '{"name":"Alberto","email":"...","event_id":1,"first_time":false}'
+     *   { first_name: "Alberto", last_name: "Urquidi", email: "...", ... }
      *
      * The Flask route reads this with request.get_json().
      */
@@ -244,7 +245,8 @@ async function submitRSVP() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name,
+        first_name: firstName,
+        last_name: lastName,
         email,
         event_id: currentEventId,
         first_time: firstTime,
@@ -257,10 +259,9 @@ async function submitRSVP() {
     // Close the modal first
     closeModal();
     if (data.status === 'duplicate') {
-      showDuplicate(name, lang);
-    }
-    else {
-      showSuccess(name, lang);
+      showDuplicate(firstName, lang);
+    } else {
+      showSuccess(firstName, lang);
     }
 
   } catch (err) {
@@ -272,7 +273,6 @@ async function submitRSVP() {
       : 'Something went wrong. Please try again.');
   }
 }
-
 
 // ── Initialization ────────────────────────────────────────────────────────────
 
