@@ -121,10 +121,10 @@ def api_rsvp():
     POST /api/rsvp
 
     Accepts an RSVP submission from the frontend form.
-    Expects a JSON body with: name, email, event_id, first_time
+    Expects a JSON body with: first_name, last_name, email, event_id, first_time
 
     On success:
-      1. Saves the RSVP to SQLite
+      1. Saves the RSVP to the database
       2. Logs it to Google Sheets as a backup
       3. Sends a confirmation email to the attendee
       4. Sends a notification email to the group inbox
@@ -140,13 +140,14 @@ def api_rsvp():
         return jsonify({'error': 'Invalid JSON'}), 400
 
     # Extract fields from the JSON body, with safe defaults
-    name       = data.get('name', '').strip()    # .strip() removes accidental whitespace
+    first_name = data.get('first_name', '').strip()
+    last_name  = data.get('last_name', '').strip()
     email      = data.get('email', '').strip()
     event_id   = data.get('event_id')
     first_time = bool(data.get('first_time', False))  # Convert to bool safely
 
     # Validate that all required fields are present
-    if not name or not email or not event_id:
+    if not first_name or not last_name or not email or not event_id:
         # 422 Unprocessable Entity — the data is there but incomplete
         return jsonify({'error': 'Missing required fields'}), 422
 
@@ -156,41 +157,42 @@ def api_rsvp():
         # 404 Not Found — event doesn't exist or has been archived
         return jsonify({'error': 'Event not found'}), 404
 
+    # Full name used for emails and display
+    full_name = f'{first_name} {last_name}'
+
     # Check for duplicate RSVP — same email can't RSVP twice for the same event
     existing = RSVP.query.filter_by(email=email, event_id=event_id).first()
     if existing:
         return jsonify({
             'status': 'duplicate',
-            'message': f'¡{name}, ya tienes un lugar reservado para este evento!'
+            'message': f'¡{first_name}, ya tienes un lugar reservado para este evento!'
         }), 200
 
-    # ── Step 1: Save to SQLite ──────────────────────────────────────────────
-    # Create a new RSVP object (this doesn't save yet — just creates it in memory)
-    rsvp = RSVP(name=name, email=email, event_id=event_id, first_time=first_time)
-    # Add it to the database session (staging area for changes)
+    # ── Step 1: Save to database ───────────────────────────────────────────
+    rsvp = RSVP(
+        first_name = first_name,
+        last_name  = last_name,
+        email      = email,
+        event_id   = event_id,
+        first_time = first_time
+    )
     db.session.add(rsvp)
-    # Commit writes all staged changes to the database file permanently
     db.session.commit()
 
     # Use Spanish event title for emails (the group's primary language)
     event_title = event.title_es
 
     # ── Step 2: Log to Google Sheets ───────────────────────────────────────
-    # This is wrapped in its own try/except inside log_rsvp() so if Sheets
-    # is unavailable, the RSVP is still saved and emails still go out.
-    log_rsvp(name, email, event_title, first_time)
+    log_rsvp(full_name, email, event_title, first_time)
 
     # ── Step 3: Confirmation email to the person who RSVPed ────────────────
-    # This is a branded HTML email thanking them and showing the event details.
-    send_rsvp_confirmation(name, email, event_title)
+    send_rsvp_confirmation(full_name, email, event_title)
 
     # ── Step 4: Notification email to the group Gmail inbox ────────────────
-    # A simple summary email so leaders know someone new is coming.
-    send_rsvp_notification(name, email, event_title, first_time)
+    send_rsvp_notification(full_name, email, event_title, first_time)
 
     # Return success — the frontend will show a thank-you message
-    return jsonify({'status': 'ok', 'message': f'¡Gracias, {name}!'})
-
+    return jsonify({'status': 'ok', 'message': f'¡Gracias, {first_name}!'})
 
 # ── Admin Panel ────────────────────────────────────────────────────────────────
 
