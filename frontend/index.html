@@ -1121,8 +1121,14 @@
       <div class="section-label" data-es="RSVP" data-en="RSVP">RSVP</div>
       <div class="section-title" data-es="Confirma tu asistencia" data-en="Confirm your attendance">Confirma tu
         asistencia</div>
-      <div class="form-group"><label data-es="NOMBRE COMPLETO" data-en="FULL NAME">NOMBRE COMPLETO</label><input
-          type="text" id="rsvp-name" placeholder="Tu nombre" /></div>
+      <div class="form-group">
+        <label data-es="NOMBRE" data-en="FIRST NAME">NOMBRE</label>
+        <input type="text" id="rsvp-first-name" placeholder="Nombre" />
+      </div>
+      <div class="form-group">
+        <label data-es="APELLIDO" data-en="LAST NAME">APELLIDO</label>
+        <input type="text" id="rsvp-last-name" placeholder="Apellido" />
+      </div>
       <div class="form-group"><label data-es="CORREO ELECTRÓNICO" data-en="EMAIL">CORREO ELECTRÓNICO</label><input
           type="email" id="rsvp-email" placeholder="tu@correo.com" /></div>
       <div class="form-group"><label data-es="¿ES TU PRIMERA VEZ?" data-en="FIRST TIME WITH US?">¿ES TU PRIMERA
@@ -1139,7 +1145,7 @@
 
   <script>
     let lang = 'es';
-    function setLang(l) { lang = l; document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active')); document.querySelector('.lang-btn:' + (l === 'es' ? 'first' : 'last') + '-child').classList.add('active'); document.querySelectorAll('[data-es]').forEach(el => { const v = el.getAttribute('data-' + l); if (!v) return; if (v.includes('<em>')) el.innerHTML = v; else el.textContent = v; }); document.getElementById('rsvp-name').placeholder = l === 'es' ? 'Tu nombre' : 'Your name'; document.getElementById('rsvp-email').placeholder = l === 'es' ? 'tu@correo.com' : 'your@email.com'; if (window.__reloadEvents) window.__reloadEvents(l); }
+    function setLang(l) { lang = l; document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active')); document.querySelector('.lang-btn:' + (l === 'es' ? 'first' : 'last') + '-child').classList.add('active'); document.querySelectorAll('[data-es]').forEach(el => { const v = el.getAttribute('data-' + l); if (!v) return; if (v.includes('<em>')) el.innerHTML = v; else el.textContent = v; }); document.getElementById('rsvp-first-name').placeholder = l === 'es' ? 'Nombre' : 'First name'; document.getElementById('rsvp-last-name').placeholder = l === 'es' ? 'Apellido' : 'Last name'; document.getElementById('rsvp-email').placeholder = l === 'es' ? 'tu@correo.com' : 'your@email.com'; if (window.__reloadEvents) window.__reloadEvents(l); }
     function goTo(s) { const e = document.querySelector(s); if (e) e.scrollIntoView({ behavior: 'smooth' }); }
     function openModal() { document.getElementById('overlay').classList.add('open'); }
     function closeModal() { document.getElementById('overlay').classList.remove('open'); }
