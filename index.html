@@ -803,6 +803,67 @@
       border-radius: 3px
     }
 
+    .prayer-section {
+      background: var(--parchment);
+      padding: 80px 0
+    }
+
+    .prayer-form-wrap {
+      max-width: 520px;
+      margin: 32px auto 0
+    }
+
+    .prayer-form-wrap .form-group {
+      margin-bottom: 20px
+    }
+
+    .prayer-form-wrap label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: .18em;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 8px
+    }
+
+    .prayer-form-wrap input,
+    .prayer-form-wrap textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--parchment-dark);
+      border-radius: 5px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--dark);
+      background: white;
+      outline: none;
+      transition: border .2s;
+      resize: vertical
+    }
+
+    .prayer-form-wrap input:focus,
+    .prayer-form-wrap textarea:focus {
+      border-color: var(--steel)
+    }
+
+    .btn-steel {
+      background: var(--steel);
+      color: var(--cream);
+      border: none;
+      padding: 14px 32px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: .2em;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background .2s;
+      width: 100%
+    }
+
+    .btn-steel:hover {
+      background: var(--steel-light)
+    }
+
     behold-widget {
       width: 100% !important;
       display: block !important;
@@ -1071,6 +1132,40 @@
     </script>
   </section>
 
+  <!-- ── PRAYER REQUESTS ── -->
+  <section class="prayer-section" id="prayer">
+    <div class="sw">
+      <div class="section-label" data-es="COMUNIDAD DE FE" data-en="FAITH COMMUNITY">COMUNIDAD DE FE</div>
+      <div class="section-title" data-es="Intenciones de <em>oración</em>" data-en="Prayer <em>intentions</em>">
+        Intenciones de <em>oración</em>
+      </div>
+      <div class="divider"></div>
+      <p class="section-intro" data-es="Comparte tu intención con nosotros. La mantendremos en oración."
+        data-en="Share your intention with us. We will keep you in our prayers.">
+        Comparte tu intención con nosotros. La mantendremos en oración.
+      </p>
+
+      <div class="prayer-form-wrap">
+        <div class="form-group">
+          <label data-es="NOMBRE (OPCIONAL)" data-en="NAME (OPTIONAL)">NOMBRE (OPCIONAL)</label>
+          <input type="text" id="prayer-name" data-placeholder-es="Tu nombre o déjalo en blanco"
+            data-placeholder-en="Your name or leave blank" placeholder="Tu nombre o déjalo en blanco" />
+        </div>
+        <div class="form-group">
+          <label data-es="INTENCIÓN DE ORACIÓN" data-en="PRAYER INTENTION">INTENCIÓN DE ORACIÓN</label>
+          <textarea id="prayer-intention" rows="4" data-placeholder-es="Escribe tu intención aquí..."
+            data-placeholder-en="Write your intention here..." placeholder="Escribe tu intención aquí..."></textarea>
+        </div>
+        <button class="btn-steel" id="prayer-btn" onclick="submitPrayer()" data-es="ENVIAR INTENCIÓN"
+          data-en="SEND INTENTION">
+          ENVIAR INTENCIÓN
+        </button>
+        <div id="prayer-msg" style="display:none;margin-top:16px;font-family:'Cinzel',serif;
+           font-size:11px;letter-spacing:.12em;color:var(--steel);text-align:center"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer>
     <div class="footer-top">
@@ -1145,10 +1240,49 @@
 
   <script>
     let lang = 'es';
-    function setLang(l) { lang = l; document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active')); document.querySelector('.lang-btn:' + (l === 'es' ? 'first' : 'last') + '-child').classList.add('active'); document.querySelectorAll('[data-es]').forEach(el => { const v = el.getAttribute('data-' + l); if (!v) return; if (v.includes('<em>')) el.innerHTML = v; else el.textContent = v; }); document.getElementById('rsvp-first-name').placeholder = l === 'es' ? 'Nombre' : 'First name'; document.getElementById('rsvp-last-name').placeholder = l === 'es' ? 'Apellido' : 'Last name'; document.getElementById('rsvp-email').placeholder = l === 'es' ? 'tu@correo.com' : 'your@email.com'; if (window.__reloadEvents) window.__reloadEvents(l); }
+    function setLang(l) { lang = l; document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active')); document.querySelector('.lang-btn:' + (l === 'es' ? 'first' : 'last') + '-child').classList.add('active'); document.querySelectorAll('[data-es]').forEach(el => { const v = el.getAttribute('data-' + l); if (!v) return; if (v.includes('<em>')) el.innerHTML = v; else el.textContent = v; }); document.getElementById('rsvp-first-name').placeholder = l === 'es' ? 'Nombre' : 'First name'; document.getElementById('rsvp-last-name').placeholder = l === 'es' ? 'Apellido' : 'Last name'; document.getElementById('rsvp-email').placeholder = l === 'es' ? 'tu@correo.com' : 'your@email.com'; if (window.__reloadEvents) window.__reloadEvents(l); document.getElementById('prayer-name').placeholder = l === 'es' ? 'Tu nombre o déjalo en blanco' : 'Your name or leave blank'; document.getElementById('prayer-intention').placeholder = l === 'es' ? 'Escribe tu intención aquí...' : 'Write your intention here...'; }
     function goTo(s) { const e = document.querySelector(s); if (e) e.scrollIntoView({ behavior: 'smooth' }); }
     function openModal() { document.getElementById('overlay').classList.add('open'); }
     function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+    async function submitPrayer() {
+      const name = document.getElementById('prayer-name').value.trim();
+      const intention = document.getElementById('prayer-intention').value.trim();
+      const lang = window.__lang || 'es';
+      const btn = document.getElementById('prayer-btn');
+      const msg = document.getElementById('prayer-msg');
+
+      if (!intention) {
+        alert(lang === 'es'
+          ? 'Por favor escribe tu intención de oración.'
+          : 'Please write your prayer intention.');
+        return;
+      }
+
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/prayer`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, intention }),
+        });
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+          document.getElementById('prayer-name').value = '';
+          document.getElementById('prayer-intention').value = '';
+          msg.textContent = lang === 'es'
+            ? '🙏 Tu intención ha sido recibida. Te tendremos en oración.'
+            : '🙏 Your intention has been received. We will keep you in our prayers.';
+          msg.style.display = 'block';
+          setTimeout(() => msg.style.display = 'none', 6000);
+        }
+      } catch (e) {
+        alert(lang === 'es' ? 'Hubo un error. Intenta de nuevo.' : 'Something went wrong. Please try again.');
+      }
+
+      btn.disabled = false;
+    }
     document.getElementById('overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
   </script>
   <script>window.__lang = "es";</script>
