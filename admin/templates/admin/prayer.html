@@ -1,0 +1,60 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+
+<div class="page-title">Intenciones de Oración</div>
+<div class="page-sub">{{ requests|length }} intenciones recibidas.</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Nombre</th>
+                <th>Intención</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requests %}
+            <tr style="{{ 'opacity:0.5' if r.prayed_for }}">
+                <td style="color:#999;font-size:12px;white-space:nowrap">
+                    {{ r.created_at.strftime('%d %b %Y') }}
+                </td>
+                <td style="font-weight:500">
+                    {{ r.name if r.name else '— Anónimo' }}
+                </td>
+                <td style="font-size:13px;color:#5C3D2E;max-width:400px;line-height:1.6">
+                    {{ r.intention }}
+                </td>
+                <td style="white-space:nowrap">
+                    {% if r.prayed_for %}
+                    <span style="color:#1B5E20;font-size:11px">● Orado</span>
+                    {% else %}
+                    <span style="color:#A08B72;font-size:11px">○ Pendiente</span>
+                    {% endif %}
+                </td>
+                <td style="white-space:nowrap">
+                    <form method="POST" action="/admin/prayer/{{ r.id }}/toggle" style="display:inline">
+                        <button type="submit" class="btn btn-outline btn-sm">
+                            {{ 'Desmarcar' if r.prayed_for else '🙏 Orado' }}
+                        </button>
+                    </form>
+                    <form method="POST" action="/admin/prayer/{{ r.id }}/delete" style="display:inline"
+                        onsubmit="return confirm('¿Eliminar esta intención?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align:center;color:#999;padding:32px">
+                    Aún no hay intenciones de oración.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
