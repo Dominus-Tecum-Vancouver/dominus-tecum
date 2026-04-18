@@ -31,7 +31,7 @@ from werkzeug.security import check_password_hash  # Verifies hashed passwords
 
 from . import db
 from .gmail_service import send_rsvp_confirmation, send_rsvp_notification
-from .models import Event, RSVP, Resource
+from .models import Event, RSVP, Resource, PrayerRequest
 from .sheets_service import log_rsvp
 
 # Create the Blueprint — 'main' is its name, used internally by Flask
@@ -470,6 +470,88 @@ def admin_recurso_delete(recurso_id):
     db.session.delete(recurso)
     db.session.commit()
     return redirect(url_for('main.admin_recursos'))
+
+# ── Prayer Request Routes ──────────────────────────────────────────────────────
+
+@bp.route('/api/prayer', methods=['POST'])
+def api_prayer():
+    """
+    POST /api/prayer
+
+    Accepts a prayer intention submitted through the public site form.
+    Name is optional — members can submit anonymously.
+
+    Expects a JSON body with: name (optional), intention (required)
+    Returns JSON: { "status": "ok" }
+    """
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({'error': 'Invalid JSON'}), 400
+
+    # Strip whitespace and default to empty string
+    name      = (data.get('name', '') or '').strip()
+    intention = (data.get('intention', '') or '').strip()
+
+    # Intention is required — name is optional
+    if not intention:
+        return jsonify({'error': 'Intention is required'}), 422
+
+    # Save to database — use None for name if left blank (anonymous)
+    prayer = PrayerRequest(
+        name      = name or None,
+        intention = intention,
+    )
+    db.session.add(prayer)
+    db.session.commit()
+
+    return jsonify({'status': 'ok'})
+
+
+@bp.route('/admin/prayer')
+@admin_required
+def admin_prayer():
+    """
+    GET /admin/prayer
+
+    Admin list of all prayer requests — newest first.
+    Leaders can see all intentions and mark them as prayed for.
+    """
+    requests = PrayerRequest.query.order_by(
+        PrayerRequest.prayed_for.asc(),   # Unprayed first
+        PrayerRequest.created_at.desc()   # Newest first within each group
+    ).all()
+    return render_template('admin/prayer.html', requests=requests)
+
+
+@bp.route('/admin/prayer/<int:request_id>/toggle', methods=['POST'])
+@admin_required
+def admin_prayer_toggle(request_id):
+    """
+    POST /admin/prayer/<id>/toggle
+
+    Toggles the 'prayed_for' status of a prayer request.
+    Called when a leader clicks the checkmark button in the admin panel.
+    """
+    prayer = PrayerRequest.query.get_or_404(request_id)
+    # Toggle — if it was prayed for, mark as not; if not, mark as prayed
+    prayer.prayed_for = not prayer.prayed_for
+    db.session.commit()
+    return redirect(url_for('main.admin_prayer'))
+
+
+@bp.route('/admin/prayer/<int:request_id>/delete', methods=['POST'])
+@admin_required
+def admin_prayer_delete(request_id):
+    """
+    POST /admin/prayer/<id>/delete
+
+    Permanently deletes a prayer request.
+    Leaders can clean up old or resolved intentions.
+    """
+    prayer = PrayerRequest.query.get_or_404(request_id)
+    db.session.delete(prayer)
+    db.session.commit()
+    return redirect(url_for('main.admin_prayer'))
 
 # ── Cron / Reminder Routes ─────────────────────────────────────────────────────
 
