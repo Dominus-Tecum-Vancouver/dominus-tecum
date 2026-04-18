@@ -169,3 +169,24 @@ class Resource(db.Model):
             'category': self.category,
             'url':      self.url,
         }
+
+class PrayerRequest(db.Model):
+    """
+    Represents a prayer intention submitted through the public site.
+
+    Prayer requests are private — only visible to leaders through
+    the admin panel. Members can submit anonymously by leaving
+    the name field blank.
+
+    Leaders can mark requests as 'prayed for' to keep track of
+    which intentions have been acknowledged.
+    """
+    __tablename__ = 'prayer_requests'
+
+    id         = db.Column(db.Integer, primary_key=True)
+    # Name is optional — members can submit anonymously
+    name       = db.Column(db.String(200), nullable=True)
+    intention  = db.Column(db.Text, nullable=False)
+    # Leaders mark this True once the intention has been prayed for
+    prayed_for = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
