@@ -805,12 +805,25 @@
 
     .prayer-section {
       background: var(--parchment);
-      padding: 48px 0
+      padding: 64px 0
+    }
+
+    .prayer-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start
     }
 
     .prayer-form-wrap {
-      max-width: 520px;
-      margin: 20px auto 0
+      margin: 0
+    }
+
+    @media(max-width:768px) {
+      .prayer-inner {
+        grid-template-columns: 1fr;
+        gap: 32px
+      }
     }
 
     .prayer-form-wrap .form-group {
@@ -1135,33 +1148,45 @@
   <!-- ── PRAYER REQUESTS ── -->
   <section class="prayer-section" id="prayer">
     <div class="sw">
-      <div class="section-label" data-es="COMUNIDAD DE FE" data-en="FAITH COMMUNITY">COMUNIDAD DE FE</div>
-      <div class="section-title" data-es="Intenciones de <em>oración</em>" data-en="Prayer <em>intentions</em>">
-        Intenciones de <em>oración</em>
-      </div>
-      <div class="divider"></div>
-      <p class="section-intro" data-es="Comparte tu intención con nosotros. La mantendremos en oración."
-        data-en="Share your intention with us. We will keep you in our prayers.">
-        Comparte tu intención con nosotros. La mantendremos en oración.
-      </p>
+      <div class="prayer-inner">
+        <!-- Left column — title and description -->
+        <div>
+          <div class="section-label" data-es="COMUNIDAD DE FE" data-en="FAITH COMMUNITY">COMUNIDAD DE FE</div>
+          <div class="section-title" data-es="Intenciones de <em>oración</em>" data-en="Prayer <em>intentions</em>">
+            Intenciones de <em>oración</em>
+          </div>
+          <div class="divider"></div>
+          <p class="section-intro" style="margin-bottom:24px"
+            data-es="Comparte tu intención con nosotros. La mantendremos en oración."
+            data-en="Share your intention with us. We will keep you in our prayers.">
+            Comparte tu intención con nosotros. La mantendremos en oración.
+          </p>
+          <p class="section-intro"
+            data-es="Todas las intenciones son confidenciales y solo las ven los líderes del grupo."
+            data-en="All intentions are confidential and only visible to group leaders.">
+            Todas las intenciones son confidenciales y solo las ven los líderes del grupo.
+          </p>
+        </div>
 
-      <div class="prayer-form-wrap">
-        <div class="form-group">
-          <label data-es="NOMBRE (OPCIONAL)" data-en="NAME (OPTIONAL)">NOMBRE (OPCIONAL)</label>
-          <input type="text" id="prayer-name" data-placeholder-es="Tu nombre o déjalo en blanco"
-            data-placeholder-en="Your name or leave blank" placeholder="Tu nombre o déjalo en blanco" />
+        <!-- Right column — form -->
+        <div class="prayer-form-wrap">
+          <div class="form-group">
+            <label data-es="NOMBRE (OPCIONAL)" data-en="NAME (OPTIONAL)">NOMBRE (OPCIONAL)</label>
+            <input type="text" id="prayer-name" data-placeholder-es="Tu nombre o déjalo en blanco"
+              data-placeholder-en="Your name or leave blank" placeholder="Tu nombre o déjalo en blanco" />
+          </div>
+          <div class="form-group">
+            <label data-es="INTENCIÓN DE ORACIÓN" data-en="PRAYER INTENTION">INTENCIÓN DE ORACIÓN</label>
+            <textarea id="prayer-intention" rows="4" data-placeholder-es="Escribe tu intención aquí..."
+              data-placeholder-en="Write your intention here..." placeholder="Escribe tu intención aquí..."></textarea>
+          </div>
+          <button class="btn-steel" id="prayer-btn" onclick="submitPrayer()" data-es="ENVIAR INTENCIÓN"
+            data-en="SEND INTENTION">
+            ENVIAR INTENCIÓN
+          </button>
+          <div id="prayer-msg" style="display:none;margin-top:16px;font-family:'Montserrat',sans-serif;
+             font-size:11px;letter-spacing:.12em;color:var(--steel);text-align:center"></div>
         </div>
-        <div class="form-group">
-          <label data-es="INTENCIÓN DE ORACIÓN" data-en="PRAYER INTENTION">INTENCIÓN DE ORACIÓN</label>
-          <textarea id="prayer-intention" rows="4" data-placeholder-es="Escribe tu intención aquí..."
-            data-placeholder-en="Write your intention here..." placeholder="Escribe tu intención aquí..."></textarea>
-        </div>
-        <button class="btn-steel" id="prayer-btn" onclick="submitPrayer()" data-es="ENVIAR INTENCIÓN"
-          data-en="SEND INTENTION">
-          ENVIAR INTENCIÓN
-        </button>
-        <div id="prayer-msg" style="display:none;margin-top:16px;font-family:'Cinzel',serif;
-           font-size:11px;letter-spacing:.12em;color:var(--steel);text-align:center"></div>
       </div>
     </div>
   </section>
