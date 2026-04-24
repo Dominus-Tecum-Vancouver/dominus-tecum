@@ -67,6 +67,8 @@ async function loadEvents(lang = 'es') {
     // { id: 1, title: "Noche de Convivencia", date: "11", month: "ABR", ... }
     const events = await res.json();
 
+    updateCountdown(events);
+
     // If there are no upcoming events, show a friendly message
     if (events.length === 0) {
       grid.innerHTML = `
@@ -272,6 +274,105 @@ async function submitRSVP() {
       ? 'Hubo un error. Por favor intenta de nuevo.'
       : 'Something went wrong. Please try again.');
   }
+}
+
+async function updateCountdown(events) {
+  // Find the countdown container in the DOM
+  // If it doesn't exist on this page, exit early
+  const container = document.getElementById('countdown-container');
+  if (!container) return;
+
+  // Find the next upcoming event from the API results
+  // We look for the first event whose date is today or in the future
+  const now = new Date();
+
+  // Month abbreviations from the API map to JavaScript month indices (0-based)
+  const months = {
+    'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+    'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+  };
+
+  // Build a Date object for each event and find the first one that hasn't passed
+  const upcoming = events.find(e => {
+    const eventDate = new Date(
+      now.getFullYear(),
+      months[e.month],
+      parseInt(e.date),
+      19, 0, 0  // Events start at 7:00 PM
+    );
+    return eventDate >= now;
+  });
+
+  // If no upcoming events exist, hide the countdown entirely
+  if (!upcoming) {
+    container.style.display = 'none';
+    return;
+  }
+
+  // Build the full Date object for the next event at 7:00 PM
+  const eventDate = new Date(
+    now.getFullYear(),
+    months[upcoming.month],
+    parseInt(upcoming.date),
+    19, 0, 0
+  );
+
+  // If the calculated date is somehow in the past (edge case), try next year
+  if (eventDate < now) {
+    eventDate.setFullYear(now.getFullYear() + 1);
+  }
+
+  /**
+   * tick() runs every second via setInterval below.
+   * It calculates the remaining time by subtracting the current time
+   * from the event time, then breaks it down into days/hours/minutes/seconds.
+   *
+   * Math breakdown:
+   *   diff = milliseconds remaining
+   *   days    = whole days remaining
+   *   hours   = remaining hours after removing whole days
+   *   minutes = remaining minutes after removing whole hours
+   *   seconds = remaining seconds after removing whole minutes
+   */
+  function tick() {
+    const diff = eventDate - new Date();
+
+    // If the countdown has reached zero, hide the container
+    if (diff <= 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    // padStart(2,'0') ensures single digits show as e.g. "05" instead of "5"
+    document.getElementById('cd-days').textContent = String(days).padStart(2, '0');
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cd-minutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('cd-seconds').textContent = String(seconds).padStart(2, '0');
+
+    // Update labels and event title based on current language
+    const lang = window.__lang || 'es';
+    document.getElementById('cd-label-days').textContent = lang === 'es' ? 'DÍAS' : 'DAYS';
+    document.getElementById('cd-label-hours').textContent = lang === 'es' ? 'HORAS' : 'HOURS';
+    document.getElementById('cd-label-minutes').textContent = 'MIN';
+    document.getElementById('cd-label-seconds').textContent = lang === 'es' ? 'SEG' : 'SEC';
+
+    // Show the event title in the current language
+    // Falls back to Spanish title if English title isn't available
+    document.getElementById('cd-event-title').textContent = lang === 'es'
+      ? upcoming.title
+      : (upcoming.title_en || upcoming.title);
+  }
+
+  // Run immediately so there's no blank flash on page load
+  tick();
+
+  // Then update every second
+  setInterval(tick, 1000);
 }
 
 // ── Initialization ────────────────────────────────────────────────────────────

@@ -990,6 +990,51 @@
         <a class="btn-outline-white" onclick="goTo('#events')" data-es="VER EVENTOS" data-en="SEE EVENTS">VER
           EVENTOS</a>
       </div>
+      <!-- Countdown -->
+      <div id="countdown-container" style="margin-top:32px;display:flex;justify-content:center;gap:24px">
+        <div style="text-align:center">
+          <div id="cd-days"
+            style="font-family:'Montserrat',sans-serif;font-size:36px;font-weight:700;color:var(--cream);line-height:1">
+            00</div>
+          <div id="cd-label-days"
+            style="font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,0.5);margin-top:4px">
+            DÍAS</div>
+        </div>
+        <div style="font-size:28px;color:rgba(255,255,255,0.3);padding-top:4px">:</div>
+        <div style="text-align:center">
+          <div id="cd-hours"
+            style="font-family:'Montserrat',sans-serif;font-size:36px;font-weight:700;color:var(--cream);line-height:1">
+            00</div>
+          <div id="cd-label-hours"
+            style="font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,0.5);margin-top:4px">
+            HORAS</div>
+        </div>
+        <div style="font-size:28px;color:rgba(255,255,255,0.3);padding-top:4px">:</div>
+        <div style="text-align:center">
+          <div id="cd-minutes"
+            style="font-family:'Montserrat',sans-serif;font-size:36px;font-weight:700;color:var(--cream);line-height:1">
+            00</div>
+          <div id="cd-label-minutes"
+            style="font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,0.5);margin-top:4px">
+            MIN</div>
+        </div>
+        <div style="font-size:28px;color:rgba(255,255,255,0.3);padding-top:4px">:</div>
+        <div style="text-align:center">
+          <div id="cd-seconds"
+            style="font-family:'Montserrat',sans-serif;font-size:36px;font-weight:700;color:var(--cream);line-height:1">
+            00</div>
+          <div id="cd-label-seconds"
+            style="font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,0.5);margin-top:4px">
+            SEG</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;text-align:center">
+        <span
+          style="font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:.15em;color:rgba(255,255,255,0.4)"
+          data-es="PRÓXIMO EVENTO:" data-en="NEXT EVENT:">PRÓXIMO EVENTO:</span>
+        <span id="cd-event-title"
+          style="font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:.15em;color:rgba(255,255,255,0.6);margin-left:6px"></span>
+      </div>
     </div>
     <div class="scroll-hint">
       <div class="scroll-line"></div>
@@ -1073,7 +1118,7 @@
             <p data-es="Nos reunimos todos los miércoles de 7 PM a 9 PM en el Hall de la Catedral del Santo Rosario."
               data-en="We meet every Wednesday from 7 PM to 9 PM at Holy Rosary Cathedral Hall.">Nos reunimos todos los
               miércoles 7 PM a 9 PM
-              en e Hall de la Catedral del Santo Rosario.</p>
+              en el Hall de la Catedral del Santo Rosario.</p>
           </div>
         </div>
         <div class="step">
