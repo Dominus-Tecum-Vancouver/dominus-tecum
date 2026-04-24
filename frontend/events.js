@@ -373,6 +373,10 @@ async function updateCountdown(events) {
 
   // Then update every second
   setInterval(tick, 1000);
+
+  // Expose tick globally so setLang() can trigger a label refresh
+  // when the user switches language without waiting for the next second
+  window.__tickCountdown = tick;
 }
 
 // ── Initialization ────────────────────────────────────────────────────────────
