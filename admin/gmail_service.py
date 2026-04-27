@@ -312,7 +312,8 @@ def send_rsvp_notification(name: str, email: str,
 
 def send_event_reminder(name: str, email: str, event_title: str,
                         event_date_es: str, event_date_en: str,
-                        event_time: str, reminder_type: str) -> bool:
+                        event_time: str, reminder_type: str,
+                        location: str = None) -> bool:
     """
     Sends a bilingual reminder email to someone who RSVPed for an upcoming event.
 
@@ -346,6 +347,9 @@ def send_event_reminder(name: str, email: str, event_title: str,
         heading_en = '<strong>Today</strong> is the day!'
         body_en    = 'We look forward to seeing you tonight!'
 
+    # Use custom location if set, otherwise default to Cathedral Hall
+    location_str = location or 'Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC'
+
     # Spanish event box
     event_box_es = f"""
     <div style="padding:16px;background:#EBF4F7;border-left:3px solid #7A1528;
@@ -353,7 +357,7 @@ def send_event_reminder(name: str, email: str, event_title: str,
       <p style="margin:0 0 6px;font-size:15px;font-weight:bold;color:#2A1810">{event_title}</p>
       <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
         &#128197; {event_date_es} &middot; {event_time}<br>
-        &#128205; Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC
+        &#128205; {location_str}
       </p>
     </div>"""
 
@@ -364,7 +368,7 @@ def send_event_reminder(name: str, email: str, event_title: str,
       <p style="margin:0 0 6px;font-size:15px;font-weight:bold;color:#2A1810">{event_title}</p>
       <p style="margin:0;font-size:13px;color:#2A5A6A;line-height:1.8">
         &#128197; {event_date_en} &middot; {event_time}<br>
-        &#128205; Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC
+        &#128205; {location_str}
       </p>
     </div>"""
 

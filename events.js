@@ -103,6 +103,17 @@ async function loadEvents(lang = 'es') {
         <div class="event-title">${e.title}</div>
         <div class="event-desc">${e.desc}</div>
 
+        <!-- Custom location — only shown if different from default Cathedral Hall -->
+        ${e.location ? `
+        <div class="event-location">
+          📍 ${e.location}
+          ${e.location_url ? `<a href="${e.location_url}" target="_blank" 
+            style="margin-left:6px;font-size:10px;color:var(--steel);text-decoration:none;
+                   font-family:'Montserrat',sans-serif;letter-spacing:.08em">
+            ${lang === 'es' ? 'VER MAPA' : 'VIEW MAP'} →
+          </a>` : ''}
+        </div>` : ''}
+
         <!-- Tag badge + RSVP button -->
         <div class="event-footer">
           <span class="event-tag tag-${e.tag}">

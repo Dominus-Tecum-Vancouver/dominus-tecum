@@ -620,6 +620,7 @@ def _send_reminders_for_offset(day_offset: int, reminder_type: str) -> dict:
                 event_date_en = event_date_en,
                 event_time    = event.time,
                 reminder_type = reminder_type,
+                location      = event.location,
             )
             if success:
                 sent_count += 1
