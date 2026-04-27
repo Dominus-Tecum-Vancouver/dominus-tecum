@@ -55,6 +55,10 @@ class Event(db.Model):
     # Only three valid values: 'social', 'faith', or 'service'.
     tag = db.Column(db.String(20), nullable=False)
 
+    # Optional custom location — if set, overrides the default Cathedral Hall address
+    # in event cards and reminder emails. Leave blank for regular Wednesday meetings.
+    location = db.Column(db.String(300), nullable=True)
+
     # Active flag lets us hide old events without deleting them.
     # Default is True (visible). Set to False to archive.
     active = db.Column(db.Boolean, default=True)
@@ -88,6 +92,7 @@ class Event(db.Model):
                 'month': 'ABR',
                 'time': '6:30 PM',
                 'tag': 'social'
+                'location': 'Deep Cove'
             }
         """
         return {
@@ -102,6 +107,7 @@ class Event(db.Model):
             'month': self.date.strftime('%b').upper(),
             'time':  self.time,
             'tag':   self.tag,
+            'location': self.location,
         }
 
 
