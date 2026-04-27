@@ -286,6 +286,9 @@ def admin_event_new():
             time     = f['time'],
             tag      = f['tag'],
             active   = True,  # New events are active by default
+            # Use None if left blank so the frontend knows to show the default location
+            location     = f.get('location') or None,
+            location_url = f.get('location_url') or None,
         )
         db.session.add(event)
         db.session.commit()
@@ -324,6 +327,8 @@ def admin_event_edit(event_id):
         # The 'active' checkbox is only in the form data when it's checked.
         # 'active' in f checks whether the key exists in the form submission.
         event.active = f.get('active') == 'active'
+        event.location     = f.get('location') or None
+        event.location_url = f.get('location_url') or None
         # No need to db.session.add() — SQLAlchemy already tracks this object.
         # Just commit to save the changes.
         db.session.commit()
