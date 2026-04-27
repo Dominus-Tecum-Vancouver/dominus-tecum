@@ -899,8 +899,8 @@
 
     .mobile-menu {
       display: none;
-      position: fixed;
-      top: 64px;
+      position: absolute;
+      top: 100%;
       left: 0;
       right: 0;
       background: var(--burgundy);
@@ -1437,6 +1437,8 @@
       // Toggle the mobile menu open/closed
       const menu = document.getElementById('mobile-menu');
       menu.classList.toggle('open');
+      // Prevent page scroll when menu is open
+      document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
     }
     function openModal() { document.getElementById('overlay').classList.add('open'); }
     function closeModal() { document.getElementById('overlay').classList.remove('open'); }
