@@ -59,6 +59,9 @@ class Event(db.Model):
     # in event cards and reminder emails. Leave blank for regular Wednesday meetings.
     location = db.Column(db.String(300), nullable=True)
 
+    # Optional Google Maps URL for custom locations
+    location_url = db.Column(db.String(500), nullable=True)
+
     # Active flag lets us hide old events without deleting them.
     # Default is True (visible). Set to False to archive.
     active = db.Column(db.Boolean, default=True)
@@ -108,6 +111,7 @@ class Event(db.Model):
             'time':  self.time,
             'tag':   self.tag,
             'location': self.location,
+            'location_url': self.location_url,
         }
 
 

@@ -2,7 +2,8 @@
 {% block content %}
 
 <div class="page-title">{{ 'Editar evento' if event else 'Nuevo evento' }}</div>
-<div class="page-sub">{{ 'Modifica los detalles del evento.' if event else 'Completa los campos en español e inglés.' }}</div>
+<div class="page-sub">{{ 'Modifica los detalles del evento.' if event else 'Completa los campos en español e inglés.' }}
+</div>
 
 <div class="card" style="max-width:700px">
   <form method="POST">
@@ -10,32 +11,35 @@
     <div class="form-row">
       <div class="form-group">
         <label>TÍTULO (ESPAÑOL)</label>
-        <input type="text" name="title_es" value="{{ event.title_es if event }}" required placeholder="Noche de Convivencia"/>
+        <input type="text" name="title_es" value="{{ event.title_es if event }}" required
+          placeholder="Noche de Convivencia" />
       </div>
       <div class="form-group">
         <label>TITLE (ENGLISH)</label>
-        <input type="text" name="title_en" value="{{ event.title_en if event }}" required placeholder="Social Night"/>
+        <input type="text" name="title_en" value="{{ event.title_en if event }}" required placeholder="Social Night" />
       </div>
     </div>
 
     <div class="form-group">
       <label>DESCRIPCIÓN (ESPAÑOL)</label>
-      <textarea name="desc_es" rows="3" required placeholder="Una noche relajada para conocernos mejor...">{{ event.desc_es if event }}</textarea>
+      <textarea name="desc_es" rows="3" required
+        placeholder="Una noche relajada para conocernos mejor...">{{ event.desc_es if event }}</textarea>
     </div>
 
     <div class="form-group">
       <label>DESCRIPTION (ENGLISH)</label>
-      <textarea name="desc_en" rows="3" required placeholder="A relaxed evening to get to know each other...">{{ event.desc_en if event }}</textarea>
+      <textarea name="desc_en" rows="3" required
+        placeholder="A relaxed evening to get to know each other...">{{ event.desc_en if event }}</textarea>
     </div>
 
     <div class="form-row">
       <div class="form-group">
         <label>FECHA / DATE</label>
-        <input type="date" name="date" value="{{ event.date.strftime('%Y-%m-%d') if event }}" required/>
+        <input type="date" name="date" value="{{ event.date.strftime('%Y-%m-%d') if event }}" required />
       </div>
       <div class="form-group">
         <label>HORA / TIME</label>
-        <input type="text" name="time" value="{{ event.time if event }}" required placeholder="7:00 PM"/>
+        <input type="text" name="time" value="{{ event.time if event }}" required placeholder="7:00 PM" />
       </div>
     </div>
 
@@ -43,9 +47,9 @@
       <div class="form-group">
         <label>TIPO / TAG</label>
         <select name="tag" required>
-          <option value="social"  {{ 'selected' if event and event.tag == 'social' }}>Social</option>
-          <option value="faith"   {{ 'selected' if event and event.tag == 'faith' }}>Fe / Faith</option>
-          <option value="service" {{ 'selected' if event and event.tag == 'service' }}>Servicio / Service</option>
+          <option value="social" {{ 'selected' if event and event.tag=='social' }}>Social</option>
+          <option value="faith" {{ 'selected' if event and event.tag=='faith' }}>Fe / Faith</option>
+          <option value="service" {{ 'selected' if event and event.tag=='service' }}>Servicio / Service</option>
         </select>
       </div>
       {% if event %}
@@ -53,10 +57,28 @@
         <label>ESTADO / STATUS</label>
         <select name="active">
           <option value="active" {{ 'selected' if event.active }}>Activo / Active</option>
-          <option value=""       {{ 'selected' if not event.active }}>Inactivo / Inactive</option>
+          <option value="" {{ 'selected' if not event.active }}>Inactivo / Inactive</option>
         </select>
       </div>
       {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label>UBICACIÓN (OPCIONAL)</label>
+      <input type="text" name="location" value="{{ event.location if event and event.location }}"
+        placeholder="Dejar en blanco para Holy Rosary Cathedral Hall" />
+      <small style="color:#999;font-size:11px">
+        Solo completar si el evento es en un lugar diferente al Hall de la Catedral.
+      </small>
+    </div>
+
+    <div class="form-group">
+      <label>ENLACE GOOGLE MAPS (OPCIONAL)</label>
+      <input type="url" name="location_url" value="{{ event.location_url if event and event.location_url }}"
+        placeholder="https://maps.app.goo.gl/..." />
+      <small style="color:#999;font-size:11px">
+        Enlace directo a Google Maps para este lugar. Dejar en blanco para usar la ubicación por defecto.
+      </small>
     </div>
 
     <div style="display:flex;gap:12px;margin-top:8px">
