@@ -177,14 +177,34 @@ def _language_divider():
     </div>"""
 
 
-def _location_box(location=None, time=None):
+def _location_box(location=None, time=None, event_date=None):
     """
     Reusable location/time info box.
-    Uses custom location if provided, otherwise defaults to Cathedral Hall.
-    Uses event time if provided, otherwise defaults to Wednesday schedule.
+    Derives the bilingual day name from event_date if provided.
+    Falls back to Wednesday schedule for regular weekly meetings.
     """
     location_str = location or 'Holy Rosary Cathedral Hall, 650 Richards St, Vancouver BC'
-    time_str     = f'Miércoles / Wednesdays · {time}' if time else 'Miércoles / Wednesdays · 7:00 – 9:00 PM'
+
+    if event_date and time:
+        # Derive bilingual day name from the actual event date
+        day_names_es = {
+            'Monday': 'Lunes', 'Tuesday': 'Martes', 'Wednesday': 'Miércoles',
+            'Thursday': 'Jueves', 'Friday': 'Viernes',
+            'Saturday': 'Sábado', 'Sunday': 'Domingo'
+        }
+        day_names_en = {
+            'Monday': 'Monday', 'Tuesday': 'Tuesday', 'Wednesday': 'Wednesday',
+            'Thursday': 'Thursday', 'Friday': 'Friday',
+            'Saturday': 'Saturday', 'Sunday': 'Sunday'
+        }
+        day_en = event_date.strftime('%A')
+        day_es = day_names_es.get(day_en, day_en)
+        day_en = day_names_en.get(day_en, day_en)
+        time_str = f'{day_es} / {day_en} · {time}'
+    else:
+        # Default for regular Wednesday meetings
+        time_str = 'Miércoles / Wednesdays · 7:00 – 9:00 PM'
+
     return f"""
     <div style="padding:16px;background:#EBF4F7;border-left:3px solid #7A1528;
                 border-radius:4px;margin-bottom:16px">
@@ -210,7 +230,7 @@ def _contact_line():
 
 # ── Member-facing emails ───────────────────────────────────────────────────────
 
-def send_rsvp_confirmation(name: str, email: str, event_title: str, location: str = None, time: str = None) -> bool:
+def send_rsvp_confirmation(name: str, email: str, event_title: str, location: str = None, time: str = None, event_date=None) -> bool:
     """
     Sends a branded confirmation email to the person who just RSVPed.
 
@@ -241,7 +261,7 @@ def send_rsvp_confirmation(name: str, email: str, event_title: str, location: st
           &iexcl;Confirmamos tu asistencia a <strong>{event_title}</strong>!
           Te esperamos con mucho gusto.
         </p>
-        {_location_box(location, time)}
+        {_location_box(location, time, event_date)}
         {_contact_line()}
       </div>
 
@@ -255,7 +275,7 @@ def send_rsvp_confirmation(name: str, email: str, event_title: str, location: st
           We&apos;ve confirmed your RSVP for <strong>{event_title}</strong>!
           We look forward to seeing you.
         </p>
-        {_location_box(location, time)}
+        {_location_box(location, time, event_date)}
         {_contact_line()}
       </div>
 
