@@ -200,7 +200,17 @@ def _location_box(location=None, time=None, event_date=None):
         day_en = event_date.strftime('%A')
         day_es = day_names_es.get(day_en, day_en)
         day_en = day_names_en.get(day_en, day_en)
-        time_str = f'{day_es} / {day_en} · {time}'
+        # Format: "Viernes 2 de mayo / Friday, May 2 · 7:00 PM"
+        month_names_es = {
+            'January': 'enero', 'February': 'febrero', 'March': 'marzo',
+            'April': 'abril', 'May': 'mayo', 'June': 'junio',
+            'July': 'julio', 'August': 'agosto', 'September': 'septiembre',
+            'October': 'octubre', 'November': 'noviembre', 'December': 'diciembre'
+        }
+        month_en = event_date.strftime('%B')
+        month_es = month_names_es.get(month_en, month_en)
+        day_num  = event_date.day
+        time_str = f'{day_es} {day_num} de {month_es} / {day_en}, {month_en} {day_num} · {time}'
     else:
         # Default for regular Wednesday meetings
         time_str = 'Miércoles / Wednesdays · 7:00 – 9:00 PM'
