@@ -267,7 +267,7 @@ def send_rsvp_confirmation(name: str, email: str, event_title: str, location: st
 
 
 def send_rsvp_notification(name: str, email: str,
-                           event_title: str, first_time: bool) -> bool:
+                           event_title: str, first_time: bool, location: str = None) -> bool:
     """
     Sends a brief notification to the group Gmail inbox whenever
     someone RSVPs, so leaders know who's coming without checking
@@ -301,6 +301,10 @@ def send_rsvp_notification(name: str, email: str,
         <tr>
           <td style="padding:6px 12px;background:#EBF4F7;font-weight:600">Evento</td>
           <td style="padding:6px 12px">{event_title}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 12px;background:#EBF4F7;font-weight:600">Lugar</td>
+          <td style="padding:6px 12px">{location or 'Holy Rosary Cathedral Hall'}</td>
         </tr>
       </table>
       <p style="color:#888;font-size:12px;margin-top:16px">

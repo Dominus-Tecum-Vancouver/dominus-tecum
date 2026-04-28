@@ -189,7 +189,7 @@ def api_rsvp():
     send_rsvp_confirmation(full_name, email, event_title, event.location, event.time)
 
     # ── Step 4: Notification email to the group Gmail inbox ────────────────
-    send_rsvp_notification(full_name, email, event_title, first_time)
+    send_rsvp_notification(full_name, email, event_title, first_time, event.location)
 
     # Return success — the frontend will show a thank-you message
     return jsonify({'status': 'ok', 'message': f'¡Gracias, {first_name}!'})
