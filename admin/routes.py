@@ -186,7 +186,7 @@ def api_rsvp():
     log_rsvp(full_name, email, event_title, first_time)
 
     # ── Step 3: Confirmation email to the person who RSVPed ────────────────
-    send_rsvp_confirmation(full_name, email, event_title, event.location)
+    send_rsvp_confirmation(full_name, email, event_title, event.location, event.time)
 
     # ── Step 4: Notification email to the group Gmail inbox ────────────────
     send_rsvp_notification(full_name, email, event_title, first_time)
